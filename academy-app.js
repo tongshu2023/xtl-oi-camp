@@ -157,9 +157,23 @@
   }
 
   function finalPage(id) {
-    const item=A.finalLevels.find(x=>x.id===id); if(!item)return notFound();
-    const staged=(window.REGULAR_L3_PROBLEMS||[]).filter(p=>String(p.source||'').includes('L3')).slice(0,6);
-    return shell(`<section class="page-hero compact final-hero"><span class="kicker">${item.id} · 复赛专题</span><h1>${item.title}</h1><p>${item.scope}。本专题 3 课，每课 2 小时：概念与例题、分层练习、真题迁移。</p></section><section class="section"><div class="three-lessons">${['建立模型','例题拆解与代码','混合训练与迁移'].map((x,i)=>`<article><span>第 ${i+1} 课</span><h3>${x}</h3><p>${i===0?'先会识别问题，再写最小模板。':i===1?'用样例逐行验证，解释每个变量的职责。':'混入相邻算法题，训练先选方法再动手。'}</p><b>120 分钟</b></article>`).join('')}</div><div class="section-head sub"><div><span class="kicker">练习入口</span><h2>真实提交，不做假判题</h2></div></div><div class="problem-list compact">${staged.length?staged.map((p,i)=>`<article><span class="problem-no">${i+1}</span><div><strong>${esc(p.title)}</strong><p>${esc(p.statement).slice(0,90)}…</p></div><button data-problem-preview="${esc(p.id)}">看题面</button></article>`).join(''):'<div class="empty-state"><strong>专题题单正在匹配考点</strong><p>可先进入洛谷官方题单训练。</p><a href="https://www.luogu.com.cn/training/list?type=official&page=1" target="_blank">打开洛谷官方题单</a></div>'}</div></section>`, 'camp');
+    const topic=(window.FINAL_LESSONS||{})[id];
+    if(!topic)return notFound();
+    const s=store.get();
+    const lessonBlocks=topic.lessons.map((l,i)=>`<section class="lesson-block" id="${esc(l.id)}" data-final-lesson="${esc(l.id)}">
+      <div class="block-title"><span>0${i+1}</span><div><b>第 ${i+1} 课 · 120 分钟</b><h2>${esc(l.title)}</h2></div></div>
+      <p><strong>本课目标：</strong>${esc(l.goal)}</p>
+      <div class="concept-grid">${l.concepts.map((c,j)=>`<article data-final-concept><span>${String(j+1).padStart(2,'0')}</span><h3>${esc(c[0])}</h3><p>${esc(c[1])}</p></article>`).join('')}</div>
+      <div class="example-box"><div><strong>完整例题 · ${esc(l.example.title)}</strong><p>${esc(l.example.statement)}</p><h3>分步思路</h3><ol>${l.example.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div><div class="trap-box"><strong>本课易错点</strong>${l.traps.map(x=>`<p>× ${esc(x)}</p>`).join('')}</div></div>
+      <h3>可编译 C++ 参考代码</h3><pre class="code final-code"><code>${esc(l.example.code)}</code></pre>
+      <div class="example-box"><div><strong>逐步讲解</strong>${l.example.walkthrough.map((x,j)=>`<p><b>第 ${j+1} 步：</b>${esc(x)}</p>`).join('')}</div></div>
+      ${s.teacherMode?`<div class="teacher-note final-teacher-tips" data-teacher-tips><strong>教师授课提示</strong>${l.teacherTips.map(x=>`<p>· ${esc(x)}</p>`).join('')}</div>`:''}
+    </section>`).join('');
+    const exercises=topic.exercises.map((p,i)=>`<article class="final-exercise"><span class="problem-no">${i+1}</span><div><strong>${esc(p.luoguId)} · ${esc(p.title)}</strong><p>${esc(p.year)} ${esc(p.source)} · ${esc(p.difficulty)} · ${esc(p.hint)}</p></div><a href="https://www.luogu.com.cn/problem/${esc(p.luoguId)}" target="_blank" rel="noreferrer">去洛谷做题 →</a></article>`).join('');
+    return shell(`<section class="page-hero compact final-hero" data-final-topic="${esc(topic.id)}"><span class="kicker">${esc(topic.id)} · 复赛专题</span><h1>${esc(topic.title)}</h1><p>3 课 × 120 分钟：建立模型、完整例题与代码、混合训练与迁移。每课都能直接用于直播讲解。</p></section>
+      <div class="lesson-layout"><aside><strong>专题导航</strong>${topic.lessons.map((l,i)=>`<a href="#${esc(l.id)}">第 ${i+1} 课</a>`).join('')}<a href="#final-exercises">专题练习</a>${s.teacherMode?'<button id="projection-mode">投屏授课</button>':''}</aside><div class="lesson-main">${lessonBlocks}
+      <section class="lesson-block" id="final-exercises"><div class="block-title"><span>04</span><div><b>专题练习</b><h2>6 道历年复赛真题，去洛谷真实提交</h2></div></div><div class="problem-list compact">${exercises}</div></section>
+      </div></div>`, 'camp');
   }
 
   function progressPage(){const s=store.get();return shell(`<section class="page-hero compact"><span class="kicker">我的学习</span><h1>${esc(s.profile.name)}，进度要看真掌握。</h1><p>${esc(s.profile.target)}</p></section><section class="section"><div class="memory-dashboard"><div><span>初赛已过关</span><strong>${s.completedLessons.length}/${lessons.length}</strong><p>小测达到 80 分才计入。</p></div><div><span>最好成绩均值</span><strong>${Math.round(Object.values(s.bestScores).reduce((a,b)=>a+b,0)/Math.max(1,Object.keys(s.bestScores).length))}</strong><p>不拿浏览时长冒充学习效果。</p></div><div><span>待修错题</span><strong>${s.wrongQuestionIds.length}</strong><p>错题清零后再做整卷。</p></div></div><div class="activity"><h2>最近真实动作</h2>${s.activity.length?s.activity.map(x=>`<article><span>${new Date(x.at).toLocaleString('zh-CN',{hour12:false})}</span><strong>${esc(x.label)}</strong></article>`).join(''):'<div class="empty-state">完成一次小测或记忆复习后，这里才会出现记录。</div>'}</div><button id="reset-progress" class="danger">清空本机学习进度</button></section>`, '');}
