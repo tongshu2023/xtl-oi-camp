@@ -1,0 +1,12 @@
+{
+  "name": "xtl-oi-camp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "小图灵信奥学习站的数据完整性校验（零后端静态站，无需构建）",
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
