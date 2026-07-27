@@ -1,0 +1,32 @@
+name: data-check
+
+# 数据完整性校验：任何改动数据/脚本/测试的提交都自动跑一遍，
+# 挡住答案越界、真题引用失效、交付清单对不上等隐蔽回归。零依赖，无需 npm install。
+on:
+  push:
+    paths:
+      - 'data/**'
+      - 'scripts/**'
+      - 'test/**'
+      - 'package.json'
+      - '.github/workflows/data-check.yml'
+  pull_request:
+    paths:
+      - 'data/**'
+      - 'scripts/**'
+      - 'test/**'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 数据自检
+        run: npm run check
+      - name: 数据完整性测试
+        run: npm test
