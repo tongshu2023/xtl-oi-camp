@@ -85,7 +85,7 @@ ${body.split('\n').map(line => `    ${line}`).join('\n')}
       check: ['for(int i=0;i<n;i++) 一共执行几次？', ['n-1', 'n', 'n+1', '不确定'], 1, 'i 依次为 0 到 n-1，共 n 次。']
     },
     {
-      match: /嵌套循环|二维枚举/,
+      match: /嵌套循环|多层循环|二维枚举/,
       core: '外层每执行一次，内层会完整执行；总次数通常是各层次数的乘积。',
       rule: '先给两层变量分别命名含义，再画一个小网格检查遍历顺序与边界。',
       example: ['打印乘法表', '输出 1×1 到 9×9 的下三角。', 'i 表示行与第二个因数，j 从 1 遍历到 i。'],
@@ -293,7 +293,7 @@ int main(){Node* head=nullptr;for(int x:{3,2,1})head=new Node{x,head};for(Node*p
       check: ['链表相对数组的典型优势是？', ['随机访问更快', '已知位置的局部插删少搬移', '自动有序', '不需要内存'], 1, '链表通过修改链接完成局部插删。']
     },
     {
-      match: /队列|广度优先|BFS|泛洪/,
+      match: /栈、队列与循环队列|广度优先|BFS|泛洪|循环队列|队列/,
       core: '队列先进先出；广度优先搜索按距离一层层扩展，第一次到达就是无权图最短步数。',
       rule: '入队时立刻标记访问，避免同一状态被多个父节点重复加入队列。',
       example: ['迷宫最少步数', '0 可走、1 障碍，从起点到终点。', '队列保存位置，dist 保存首次到达步数。'],
@@ -334,7 +334,7 @@ int main(){int n;cin>>n;t.resize(n);for(auto&x:t)cin>>x.l>>x.r;cout<<height(0)<<
       check: ['n 个结点的树有多少条边？', ['n', 'n-1', 'n+1', '2n'], 1, '树连通且无环，边数恒为 n-1。']
     },
     {
-      match: /优先队列|堆/,
+      match: /堆与优先队列|优先队列|堆/,
       core: '优先队列每次取当前最大或最小元素，适合动态维护“最急的一项”。',
       rule: '先确认要大根堆还是小根堆；元素是结构体时明确优先级和相等规则。',
       example: ['合并果子', '每次合并最轻的两堆，使总代价最小。', '把所有重量放入小根堆，每次取两个最小值。'],
@@ -407,7 +407,7 @@ int main(){int n,m;cin>>n>>m;p.resize(n+1);iota(p.begin(),p.end(),0);while(m--){
       core: '动态规划最值题不仅要写出转移，还要识别无效状态、重复计算和可滚动的维度，控制时间与空间。',
       rule: '先得到正确的朴素 DP，再根据依赖范围做滚动数组或删去不可能更优的状态；优化前后必须保持状态语义不变。',
       example: ['数字三角形最大路径', '从顶端走到底层，每步到左下或右下，求路径和最大值。', '逐行更新 dp[j]=max(dp[j-1],dp[j])+a[i][j]，j 必须倒序避免覆盖旧行。'],
-      code: cpp('int n;cin>>n;vector<long long>dp(n+1,LLONG_MIN/4);dp[0]=0;\nfor(int i=1;i<=n;i++)for(int j=i;j>=1;j--){long long x;cin>>x;dp[j]=max(dp[j-1],dp[j])+x;}\ncout<<*max_element(dp.begin(),dp.end())<<\'\\n\';'),
+      code: cpp('int n;cin>>n;vector<long long>dp(n+1,LLONG_MIN/4);dp[0]=0;\nfor(int i=1;i<=n;i++){vector<long long>row(i+1);for(int j=1;j<=i;j++)cin>>row[j];for(int j=i;j>=1;j--)dp[j]=max(dp[j-1],dp[j])+row[j];}\ncout<<*max_element(dp.begin(),dp.end())<<\'\\n\';'),
       practice: ['滚动数组为什么要关注枚举方向？', '什么时候不能直接删除一维？'],
       answer: ['更新后的值可能覆盖同一轮仍需使用的旧状态。', '当前状态若依赖更早多层或需要恢复方案，就要保留相应信息。'],
       trap: '还没证明朴素转移正确就直接套优化模板。',
@@ -667,8 +667,41 @@ using namespace std;int main(){ifstream fin("score.txt");if(!fin){cerr<<"open fa
     return matches[0]?.profile || fallback;
   }
 
+  const assessmentAnchors = {
+    'regular-l1': '时间与单位换算',
+    'regular-l2': '数组遍历与统计',
+    'regular-l3': '二分查找',
+    'regular-l4': '广度优先搜索',
+    'gesp-1': '顺序与分支结构',
+    'gesp-2': '多层循环结构',
+    'gesp-3': '数组字符串综合',
+    'gesp-4': '结构体',
+    'gesp-5': '欧几里得算法',
+    'gesp-6': '简单背包问题',
+    'gesp-7': '二维动态规划',
+    'gesp-8': '单源最短路'
+  };
+
   function makeLesson(course, index, title) {
-    const p = pickProfile(title);
+    let p = pickProfile(title);
+    if (/测评/.test(title)) {
+      const anchor = assessmentAnchors[course.id];
+      const base = pickProfile(anchor);
+      const scope = course.lessonTitles.slice(0, -1);
+      p = Object.assign({}, base, {
+        core: `${course.level} 阶段测评覆盖：${scope.join('、')}。测评不是再看一遍讲义，而是独立完成跨知识点任务。`,
+        rule: `先用 10 分钟浏览整卷并标出会做题，再完成“${anchor}”主任务，最后回查输入边界、复杂度和输出格式。`,
+        practice: [
+          `闭卷写出“${scope[Math.max(0, Math.floor(scope.length / 3))]}”的核心规则和一个边界。`,
+          `把“${scope[Math.max(0, Math.floor(scope.length * 2 / 3))]}”与“${anchor}”组合成一道小题并写出算法。`
+        ],
+        answer: [
+          '答案必须包含准确概念、最小示例和一个能暴露错误理解的边界。',
+          '组合题必须写清输入、状态、处理步骤、复杂度和用于自测的期望输出。'
+        ],
+        trap: '按章节顺序机械作答，不先分配时间；卡在一题后没有留下检查与改错时间。'
+      });
+    }
     const id = `${course.id}-${String(index + 1).padStart(2, '0')}`;
     const memory = [
       { id: `${id}-m1`, tag: '核心', prompt: `“${title}”解决什么问题？`, answer: p.core },
@@ -709,7 +742,7 @@ using namespace std;int main(){ifstream fin("score.txt");if(!fin){cerr<<"open fa
 
   function makeCourses(rows, track) {
     return rows.map(([id, level, title, titles], courseIndex) => {
-      const course = { id, level, title, track, order: courseIndex + 1 };
+      const course = { id, level, title, track, order: courseIndex + 1, lessonTitles: titles };
       course.lessons = titles.map((lessonTitle, index) => makeLesson(course, index, lessonTitle));
       course.units = [
         { title: '建立模型', lessons: course.lessons.slice(0, Math.ceil(course.lessons.length / 2)) },
@@ -724,7 +757,7 @@ using namespace std;int main(){ifstream fin("score.txt");if(!fin){cerr<<"open fa
 
   const courses = [...makeCourses(regular, 'regular'), ...makeCourses(gesp, 'gesp')];
   window.COURSE_CATALOG = {
-    version: '2026.07.28-full-v1',
+    version: '2026.07.28-full-v2',
     sources: {
       noi: 'https://noi.ccf.org.cn/cbw/2025-04-18/841594.shtml',
       gesp: 'https://gesp.ccf.org.cn/101/1008/10012.html',
