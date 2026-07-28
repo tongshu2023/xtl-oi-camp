@@ -30,7 +30,7 @@
       <div class="nav-shell">
         <button class="brand" data-route="home" aria-label="返回首页"><span class="brand-mark">XT</span><span><strong>小图灵信奥学习站</strong><small>从基础到赛场，一站学完</small></span></button>
         <nav class="main-nav">${nav.map(x => `<button class="${active===x[0]?'active':''}" data-route="${x[0]}">${x[1]}</button>`).join('')}</nav>
-        <div class="header-actions"><button class="mode-btn ${s.teacherMode?'on':''}" id="teacher-mode">${s.teacherMode?'教师模式':'教师备课'}</button><button class="avatar" data-route="progress">${s.teacherMode?'师':'学'}</button></div>
+        <div class="header-actions"><button class="notes-header-btn" type="button" data-notes-open>我的笔记 <span data-notes-count>0</span></button><button class="mode-btn ${s.teacherMode?'on':''}" id="teacher-mode">${s.teacherMode?'教师模式':'教师备课'}</button><button class="avatar" data-route="progress">${s.teacherMode?'师':'学'}</button></div>
       </div>
     </header>`;
   }
@@ -59,8 +59,8 @@
     `, 'home');
   }
 
-  function timeline(items) {
-    return `<div class="timeline">${items.map((x,i)=>`<div class="timeline-item"><span>${x[0]}</span><div><strong>${x[1]}</strong><p>${x[2]}</p></div>${i<items.length-1?'<i></i>':''}</div>`).join('')}</div>`;
+  function timeline(items, notePrefix = '') {
+    return `<div class="timeline">${items.map((x,i)=>`<div class="timeline-item" ${notePrefix?`data-note-block="${esc(notePrefix)}-timeline-${i}"`:''}><span>${x[0]}</span><div><strong>${x[1]}</strong><p>${x[2]}</p></div>${i<items.length-1?'<i></i>':''}</div>`).join('')}</div>`;
   }
 
   function regularPage() {
@@ -98,10 +98,10 @@
     if (locked) return shell(`<section class="locked-page"><strong>这一关还没解锁</strong><p>先完成上一关的小测，达到 80 分即可继续。</p><button class="primary" data-route="camp">返回闯关地图</button></section>`, 'camp');
     const result = ui.quizResults[id];
     return shell(`<section class="lesson-hero"><div><button class="back" data-route="camp">← 返回地图</button><span>${l.id} · 120 分钟</span><h1>${l.title}</h1><p>${l.goal}</p></div><div class="lesson-progress"><span>过关线</span><strong>${s.bestScores[id]||0}<i>/100</i></strong><b>${s.completedLessons.includes(id)?'已通关':'完成小测解锁下一关'}</b></div></section>
-      <div class="lesson-layout"><aside><strong>本课导航</strong><a href="#lesson-map">课程节奏</a><a href="#concepts">核心讲义</a><a href="#examples">例子与陷阱</a><a href="#recall">记忆卡</a><a href="#quiz">出口小测</a>${s.teacherMode?'<button id="projection-mode">投屏授课</button>':''}</aside><div class="lesson-main">
-        <section class="lesson-block" id="lesson-map"><div class="block-title"><span>01</span><div><b>两小时怎么上</b><h2>先想、再学、再练、最后讲回</h2></div></div>${timeline(l.schedule)}</section>
-        <section class="lesson-block" id="concepts"><div class="block-title"><span>02</span><div><b>核心讲义</b><h2>一张地图装下本课知识</h2></div></div><div class="concept-grid">${l.concepts.map((c,i)=>`<article><span>${String(i+1).padStart(2,'0')}</span><h3>${c[0]}</h3><p>${c[1]}</p></article>`).join('')}</div></section>
-        <section class="lesson-block" id="examples"><div class="block-title"><span>03</span><div><b>例子与陷阱</b><h2>会做之前，先知道会错在哪</h2></div></div><div class="example-box"><div><strong>课堂示例</strong>${l.examples.map(x=>`<p>${esc(x)}</p>`).join('')}</div><div class="trap-box"><strong>高频陷阱</strong>${l.traps.map(x=>`<p>× ${esc(x)}</p>`).join('')}</div></div>${s.teacherMode?`<div class="teacher-note"><strong>教师授课抓手</strong><p>先让学生公开预测，再揭晓；每个错误都追问“是知识不会、读题失误，还是跟踪过程丢状态”。本课最后随机点一名学生用 60 秒讲回核心地图。</p></div>`:''}</section>
+      <div class="lesson-layout"><aside><strong>本课导航</strong><a href="#lesson-map">课程节奏</a><a href="#concepts">核心讲义</a><a href="#examples">例子与陷阱</a><a href="#recall">记忆卡</a><a href="#quiz">出口小测</a>${s.teacherMode?'<button id="projection-mode">投屏授课</button>':''}</aside><div class="lesson-main" data-note-course-id="${esc(l.id)}" data-note-course-title="${esc(`${l.id} · ${l.title}`)}" data-note-route="lesson/${esc(l.id)}">
+        <section class="lesson-block" id="lesson-map"><div class="block-title"><span>01</span><div><b>两小时怎么上</b><h2>先想、再学、再练、最后讲回</h2></div></div>${timeline(l.schedule, l.id)}</section>
+        <section class="lesson-block" id="concepts"><div class="block-title"><span>02</span><div><b>核心讲义</b><h2>一张地图装下本课知识</h2></div></div><div class="concept-grid">${l.concepts.map((c,i)=>`<article data-note-block="${esc(l.id)}-concept-${i}"><span>${String(i+1).padStart(2,'0')}</span><h3>${c[0]}</h3><p>${c[1]}</p></article>`).join('')}</div></section>
+        <section class="lesson-block" id="examples"><div class="block-title"><span>03</span><div><b>例子与陷阱</b><h2>会做之前，先知道会错在哪</h2></div></div><div class="example-box"><div><strong>课堂示例</strong>${l.examples.map((x,i)=>`<p data-note-block="${esc(l.id)}-example-${i}">${esc(x)}</p>`).join('')}</div><div class="trap-box"><strong>高频陷阱</strong>${l.traps.map((x,i)=>`<p data-note-block="${esc(l.id)}-trap-${i}">× ${esc(x)}</p>`).join('')}</div></div>${s.teacherMode?`<div class="teacher-note"><strong>教师授课抓手</strong><p>先让学生公开预测，再揭晓；每个错误都追问“是知识不会、读题失误，还是跟踪过程丢状态”。本课最后随机点一名学生用 60 秒讲回核心地图。</p></div>`:''}</section>
         <section class="lesson-block" id="recall"><div class="block-title"><span>04</span><div><b>主动回忆</b><h2>先回答，点开后再核对</h2></div></div><div class="memory-cards">${l.memory.map(card=>memoryCard(card)).join('')}</div></section>
         <section class="lesson-block" id="quiz"><div class="block-title"><span>05</span><div><b>出口小测</b><h2>80 分过关，只补真正薄弱处</h2></div></div><form id="lesson-quiz">${l.quiz.map((q,i)=>quizQuestion(l,q,i,result,s.teacherMode)).join('')}<button class="primary quiz-submit" type="submit">交卷并生成错因</button></form>${result?quizSummary(l,result):''}</section>
       </div></div>`, 'camp');
@@ -162,16 +162,16 @@
     const s=store.get();
     const lessonBlocks=topic.lessons.map((l,i)=>`<section class="lesson-block" id="${esc(l.id)}" data-final-lesson="${esc(l.id)}">
       <div class="block-title"><span>0${i+1}</span><div><b>第 ${i+1} 课 · 120 分钟</b><h2>${esc(l.title)}</h2></div></div>
-      <p><strong>本课目标：</strong>${esc(l.goal)}</p>
-      <div class="concept-grid">${l.concepts.map((c,j)=>`<article data-final-concept><span>${String(j+1).padStart(2,'0')}</span><h3>${esc(c[0])}</h3><p>${esc(c[1])}</p></article>`).join('')}</div>
-      <div class="example-box"><div><strong>完整例题 · ${esc(l.example.title)}</strong><p>${esc(l.example.statement)}</p><h3>分步思路</h3><ol>${l.example.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div><div class="trap-box"><strong>本课易错点</strong>${l.traps.map(x=>`<p>× ${esc(x)}</p>`).join('')}</div></div>
-      <h3>可编译 C++ 参考代码</h3><pre class="code final-code"><code>${esc(l.example.code)}</code></pre>
-      <div class="example-box"><div><strong>逐步讲解</strong>${l.example.walkthrough.map((x,j)=>`<p><b>第 ${j+1} 步：</b>${esc(x)}</p>`).join('')}</div></div>
+      <p data-note-block="${esc(topic.id)}-${esc(l.id)}-goal"><strong>本课目标：</strong>${esc(l.goal)}</p>
+      <div class="concept-grid">${l.concepts.map((c,j)=>`<article data-final-concept data-note-block="${esc(topic.id)}-${esc(l.id)}-concept-${j}"><span>${String(j+1).padStart(2,'0')}</span><h3>${esc(c[0])}</h3><p>${esc(c[1])}</p></article>`).join('')}</div>
+      <div class="example-box"><div><strong>完整例题 · ${esc(l.example.title)}</strong><p data-note-block="${esc(topic.id)}-${esc(l.id)}-statement">${esc(l.example.statement)}</p><h3>分步思路</h3><ol>${l.example.steps.map((x,j)=>`<li data-note-block="${esc(topic.id)}-${esc(l.id)}-step-${j}">${esc(x)}</li>`).join('')}</ol></div><div class="trap-box"><strong>本课易错点</strong>${l.traps.map((x,j)=>`<p data-note-block="${esc(topic.id)}-${esc(l.id)}-trap-${j}">× ${esc(x)}</p>`).join('')}</div></div>
+      <h3>可编译 C++ 参考代码</h3><pre class="code final-code" data-note-block="${esc(topic.id)}-${esc(l.id)}-code"><code>${esc(l.example.code)}</code></pre>
+      <div class="example-box"><div><strong>逐步讲解</strong>${l.example.walkthrough.map((x,j)=>`<p data-note-block="${esc(topic.id)}-${esc(l.id)}-walkthrough-${j}"><b>第 ${j+1} 步：</b>${esc(x)}</p>`).join('')}</div></div>
       ${s.teacherMode?`<div class="teacher-note final-teacher-tips" data-teacher-tips><strong>教师授课提示</strong>${l.teacherTips.map(x=>`<p>· ${esc(x)}</p>`).join('')}</div>`:''}
     </section>`).join('');
     const exercises=topic.exercises.map((p,i)=>`<article class="final-exercise"><span class="problem-no">${i+1}</span><div><strong>${esc(p.luoguId)} · ${esc(p.title)}</strong><p>${esc(p.year)} ${esc(p.source)} · ${esc(p.difficulty)} · ${esc(p.hint)}</p></div><a href="https://www.luogu.com.cn/problem/${esc(p.luoguId)}" target="_blank" rel="noreferrer">去洛谷做题 →</a></article>`).join('');
     return shell(`<section class="page-hero compact final-hero" data-final-topic="${esc(topic.id)}"><span class="kicker">${esc(topic.id)} · 复赛专题</span><h1>${esc(topic.title)}</h1><p>3 课 × 120 分钟：建立模型、完整例题与代码、混合训练与迁移。每课都能直接用于直播讲解。</p></section>
-      <div class="lesson-layout"><aside><strong>专题导航</strong>${topic.lessons.map((l,i)=>`<a href="#${esc(l.id)}">第 ${i+1} 课</a>`).join('')}<a href="#final-exercises">专题练习</a>${s.teacherMode?'<button id="projection-mode">投屏授课</button>':''}</aside><div class="lesson-main">${lessonBlocks}
+      <div class="lesson-layout"><aside><strong>专题导航</strong>${topic.lessons.map((l,i)=>`<a href="#${esc(l.id)}">第 ${i+1} 课</a>`).join('')}<a href="#final-exercises">专题练习</a>${s.teacherMode?'<button id="projection-mode">投屏授课</button>':''}</aside><div class="lesson-main" data-note-course-id="${esc(topic.id)}" data-note-course-title="${esc(`${topic.id} · ${topic.title}`)}" data-note-route="final/${esc(topic.id)}">${lessonBlocks}
       <section class="lesson-block" id="final-exercises"><div class="block-title"><span>04</span><div><b>专题练习</b><h2>6 道历年复赛真题，去洛谷真实提交</h2></div></div><div class="problem-list compact">${exercises}</div></section>
       </div></div>`, 'camp');
   }
@@ -184,6 +184,7 @@
     const [page,id]=pathParts();
     const pages={home:homePage,regular:regularPage,'regular-l3':regularL3Page,gesp:gespPage,camp:campPage,lesson:()=>lessonPage(id),exams:examsPage,'second-exams':secondExamsPage,memory:memoryPage,plan:planPage,final:()=>finalPage(id),progress:progressPage};
     app.innerHTML=(pages[page]||notFound)(); bind(); window.scrollTo(0,0);
+    document.dispatchEvent(new CustomEvent('academy:rendered', { detail: { page, id } }));
   }
 
   function bind() {

@@ -21,3 +21,75 @@
   .timeline-item p{margin:3px 0 0}
   .timeline-item i{display:none}
 }
+
+/* 本地阅读笔记：独立于学习进度，只作用于带稳定锚点的课程正文。 */
+.notes-header-btn{border:1px solid #435071;background:#1c2949;color:#e7ebf7;border-radius:999px;padding:7px 12px;font-size:12px;white-space:nowrap}
+.notes-header-btn:hover{border-color:#7d8bb0;background:#263657}
+.notes-header-btn span{display:inline-grid;place-items:center;min-width:20px;height:20px;margin-left:4px;padding:0 5px;border-radius:999px;background:#fff3d2;color:#8f6514;font-size:10px;font-weight:800}
+.notes-selection-toolbar{position:fixed;z-index:310;display:flex;gap:3px;padding:5px;background:#111b31;border:1px solid #33415e;border-radius:12px;box-shadow:0 12px 35px rgba(8,16,40,.3)}
+.notes-selection-toolbar[hidden]{display:none}
+.notes-selection-toolbar button{border:0;background:transparent;color:#fff;border-radius:8px;padding:7px 11px;font-size:12px}
+.notes-selection-toolbar button:hover,.notes-selection-toolbar button:focus-visible{background:#2d4169;outline:none}
+mark.course-note-highlight{background:linear-gradient(transparent 8%,#ffe79a 8%,#ffe79a 92%,transparent 92%);color:inherit;padding:1px 0;border-radius:3px;cursor:pointer;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+mark.course-note-highlight:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+mark.course-note-highlight.flash{animation:note-flash 1.5s ease}
+@keyframes note-flash{0%,100%{box-shadow:none}30%{box-shadow:0 0 0 5px rgba(255,176,54,.35);background:#ffd166}}
+.notes-drawer{position:fixed;z-index:300;right:0;top:72px;bottom:0;width:390px;max-width:100%;display:flex;flex-direction:column;background:#fff;border-left:1px solid var(--line);box-shadow:-18px 0 55px rgba(16,26,51,.16);transform:translateX(105%);transition:transform .22s ease;overflow:hidden}
+.notes-drawer.open{transform:translateX(0)}
+.notes-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px}
+.notes-drawer-head span,.notes-drawer-head strong{display:block}
+.notes-drawer-head span{color:var(--blue);font-size:10px;font-weight:800;letter-spacing:.12em}
+.notes-drawer-head strong{font-size:22px}
+.notes-close{width:34px;height:34px;border:0;border-radius:50%;background:#eef1f6;color:#5c6679;font-size:20px}
+.notes-local-hint{margin:0 20px 14px;padding:11px 12px;border-radius:10px;background:#fff8e8;color:#76602f;font-size:11px;line-height:1.5}
+.notes-tabs{display:flex;gap:7px;padding:0 20px 12px}
+.notes-tabs button{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:7px 11px;font-size:11px}
+.notes-tabs button.active{border-color:#a8bcf4;background:#edf3ff;color:var(--blue);font-weight:700}
+.notes-tabs button:disabled{opacity:.45;cursor:not-allowed}
+.notes-list{flex:1;min-height:0;overflow:auto;padding:0 13px 15px}
+.notes-list-item{border-bottom:1px solid #edf0f5}
+.notes-list-item>button{display:block;width:100%;border:0;background:#fff;text-align:left;padding:14px 8px;border-radius:10px}
+.notes-list-item>button:hover,.notes-list-item.active>button{background:#f5f8ff}
+.notes-list-item q{display:block;color:#2f3d59;font-size:13px;line-height:1.55;quotes:"“" "”";max-height:62px;overflow:hidden}
+.notes-list-item p{margin:7px 0;color:#556278;font-size:12px;white-space:pre-wrap;word-break:break-word}
+.notes-list-item .notes-no-thought{color:#a0a7b4}
+.notes-list-item span{display:block;color:#929bad;font-size:10px}
+.notes-list-item em{display:inline-block;margin-top:7px;border-radius:999px;background:#fff1e8;color:#b9571b;padding:3px 7px;font-size:10px;font-style:normal}
+.notes-empty{padding:42px 22px;text-align:center;color:var(--muted)}
+.notes-empty strong{display:block;color:var(--ink)}
+.notes-empty p{font-size:12px}
+.notes-editor{position:absolute;inset:154px 0 55px;background:#fff;z-index:2;padding:16px 20px;overflow:auto;border-top:1px solid var(--line)}
+.notes-editor-back{border:0;background:none;color:var(--blue);padding:0 0 13px;font-size:12px}
+.notes-editor blockquote{margin:0 0 16px;padding:13px 15px;border-left:4px solid #f1c856;background:#fff9e8;color:#4c566b;border-radius:0 10px 10px 0;font-size:13px}
+.notes-editor label{display:block;margin-bottom:7px;font-size:12px;font-weight:700}
+.notes-editor textarea{display:block;width:100%;resize:vertical;border:1px solid #ccd4e2;border-radius:12px;padding:12px;line-height:1.65;color:var(--ink);background:#fff}
+.notes-editor textarea:focus{outline:2px solid #cbd8ff;border-color:var(--blue)}
+.notes-editor-actions{display:grid;gap:8px;margin-top:12px}
+.notes-editor-actions button{border:1px solid #d4dbe9;background:#fff;color:#4d5b73;border-radius:10px;padding:9px 11px}
+.notes-editor-actions .primary{border:0;color:#fff;background:var(--blue)}
+.notes-editor-actions .danger{margin-top:5px;color:var(--red);border-color:#efc2c7}
+.notes-backup-actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--line);background:#fff}
+.notes-backup-actions button{flex:1;border:1px solid #cdd6e7;background:#fff;color:var(--blue);border-radius:9px;padding:8px;font-size:11px}
+.notes-backup-actions button:disabled{color:#a3acbc;background:#f3f4f7;cursor:not-allowed}
+@media(min-width:1100px){
+  body.notes-panel-open #app{margin-right:390px}
+  body.notes-panel-open .lesson-layout{grid-template-columns:190px minmax(0,1fr)}
+}
+@media(max-width:1099px){
+  .notes-drawer{top:auto;left:0;width:100%;height:min(72vh,650px);border-left:0;border-top:1px solid var(--line);border-radius:20px 20px 0 0;transform:translateY(105%);box-shadow:0 -16px 45px rgba(16,26,51,.2)}
+  .notes-drawer.open{transform:translateY(0)}
+  .notes-editor{inset:154px 0 55px}
+}
+@media(max-width:700px){
+  .header-actions{grid-column:1/3;grid-row:2;justify-content:flex-end;gap:6px}
+  .main-nav{grid-row:3}
+  .notes-header-btn{padding:6px 9px}
+  .notes-header-btn span{min-width:18px;height:18px}
+  .mode-btn{padding:7px 9px;white-space:nowrap}
+  .notes-drawer{height:min(78vh,700px)}
+  .notes-drawer-head{padding-top:15px}
+}
+@media print{
+  .notes-drawer,.notes-selection-toolbar,.notes-header-btn{display:none!important}
+  mark.course-note-highlight{background:transparent}
+}
