@@ -35,4 +35,4 @@ npm.cmd run check
 npm.cmd test
 ```
 
-数据与静态合同测试覆盖正式入口、三类课程、全部开放、146 节新增内容合同、GESP 修订边界、18 节复赛内容、参考代码与 10 套本地第一轮真题；真实浏览器验收脚本另见 `e2e/notes-browser.mjs`、`e2e/layout-browser.mjs`。
+数据与静态合同测试覆盖正式入口、三类课程、全部开放、146 节新增内容合同、GESP 修订边界、18 节复赛内容、参考代码与 10 套本地第一轮真题；真实浏览器布局验收逐一覆盖 146 节常规/GESP 课程、8 个 CSP-J 第一轮关卡和 6 个第二轮专题，共 160 个入口，脚本另见 `e2e/notes-browser.mjs`、`e2e/layout-browser.mjs`。

@@ -126,6 +126,9 @@ mark.course-note-highlight.flash{animation:note-flash 1.5s ease}
 .practice-grid details div{padding-top:12px;color:#29415c;line-height:1.7}
 .lesson-next{display:flex;justify-content:space-between;gap:14px;margin-top:24px}
 .lesson-next button{max-width:48%}
+/* 课程内容必须在正文列内收缩；长代码只在代码框内部横向滚动，不能撑宽整页。 */
+.lesson-main,.lesson-block,.worked-problem,.example-box>div,.practice-grid article{min-width:0}
+.lesson-block pre{display:block;max-width:100%;overflow-x:auto}
 /* 宽屏阅读版式：扩大课程正文的真实可用宽度，同时用字号与留白维持舒适行长。 */
 @media(min-width:981px){
   .lesson-hero{

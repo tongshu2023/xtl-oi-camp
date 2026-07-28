@@ -49,7 +49,7 @@ npm run check   # 加载全部数据并打印内容清单（快速自检）
 npm test        # 运行数据完整性断言
 ```
 
-阅读笔记和宽屏/手机布局另有真实 Chromium 端到端验收脚本 `e2e/notes-browser.mjs`、`e2e/layout-browser.mjs`。在已启动 Chrome DevTools 端口（默认 `127.0.0.1:9338`）时，分别运行 `npm run test:notes:e2e`、`npm run test:layout:e2e`。
+阅读笔记和宽屏/手机布局另有真实 Chromium 端到端验收脚本 `e2e/notes-browser.mjs`、`e2e/layout-browser.mjs`。布局验收会逐一打开 146 节常规/GESP 课程、8 个 CSP-J 第一轮关卡和 6 个第二轮专题，共 160 个入口；在已启动 Chrome DevTools 端口（默认 `127.0.0.1:9338`）时，分别运行 `npm run test:notes:e2e`、`npm run test:layout:e2e`。
 
 校验内容包括：70+76 节课程内容合同、GESP 修订边界、初赛题/课程小测答案下标、正式入口脚本链、真题引用、题目 ID、年份、复赛 18 节讲义与参考代码补丁符号。改数据后先跑一遍即可挡住多数低级回归。
 
