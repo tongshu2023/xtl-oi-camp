@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 
 const cdpBase = process.env.CDP_URL || 'http://127.0.0.1:9338';
 const projectDir = process.env.PROJECT_DIR || process.cwd();
-const pageUrl = `${pathToFileURL(path.join(projectDir, 'academy.html')).href}#/lesson/J1`;
+const pageUrl = process.env.PAGE_URL || `${pathToFileURL(path.join(projectDir, 'academy.html')).href}#/lesson/J1`;
 const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 async function newTarget(url) {
