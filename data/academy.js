@@ -3,7 +3,7 @@
     { id: 'regular-l1', level: 'L1', title: 'C++ 编程启蒙', subtitle: '输出、变量、输入与顺序结构', lessons: 16, duration: '32 小时', status: 'ready', tags: ['零基础', '常规课'] },
     { id: 'regular-l2', level: 'L2', title: '控制结构与基础算法', subtitle: '分支、循环、函数、数组与字符串', lessons: 20, duration: '40 小时', status: 'ready', tags: ['基础能力', '常规课'] },
     { id: 'regular-l3', level: 'L3', title: '算法与数据结构入门', subtitle: '排序、递归、贪心、栈队列与树', lessons: 16, duration: '32 小时', status: 'ready', tags: ['31 道真实课后题', '有道课程'] },
-    { id: 'regular-l4', level: 'L4', title: '竞赛算法进阶', subtitle: '搜索、动态规划、图论与综合训练', lessons: 18, duration: '36 小时', status: 'planned', tags: ['进阶', '逐步补充'] }
+    { id: 'regular-l4', level: 'L4', title: '竞赛算法进阶', subtitle: '搜索、动态规划、图论与综合训练', lessons: 18, duration: '36 小时', status: 'ready', tags: ['进阶', '完整开放'] }
   ];
 
   const gesp = [
@@ -20,6 +20,10 @@
   const firstRound = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025].map(year => {
     const legacy = year < 2019;
     const local = {
+      2015: 'content_staging/history/2015_exam.pdf',
+      2016: 'content_staging/history/2016_exam.pdf',
+      2017: 'content_staging/history/2017_exam.pdf',
+      2018: 'content_staging/history/2018_exam.pdf',
       2019: 'content_staging/cspjs2019hj_cpp.pdf',
       2020: 'content_staging/cspjs2020hj_cpp.pdf',
       2021: 'content_staging/_src/2021_exam.pdf',
@@ -28,6 +32,10 @@
       2024: 'content_staging/_pdf/j2024_q.pdf'
     }[year] || null;
     const answer = {
+      2015: 'content_staging/history/2015_answer.pdf',
+      2016: 'content_staging/history/2016_answer.pdf',
+      2017: 'content_staging/history/2017_answer.pdf',
+      2018: 'content_staging/history/2018_answer.pdf',
       2019: 'content_staging/cspjs2019hj_sol.pdf',
       2020: 'content_staging/cspjs2020hj_sol.pdf',
       2021: 'content_staging/_src/2021_sol.pdf',
@@ -41,7 +49,7 @@
       family: legacy ? 'NOIP 历史衔接卷' : 'CSP-J 正式卷',
       localPaper: local, localAnswer: answer,
       status: local ? 'local' : 'catalog',
-      note: year === 2025 ? '已纳入年度目录；正式题面继续核对官方来源后灌入。' : '按 2 小时正式节奏完成，并做错因复盘。'
+      note: year === 2025 ? '已纳入年度目录；CCF 官网尚未公开第一轮题面下载，不用社区扫描件冒充官方卷。' : '按 2 小时正式节奏完成，并做错因复盘。'
     };
   });
 
@@ -77,7 +85,7 @@
     ],
     sources: {
       cspNotice: 'https://www.noi.cn/xw/2025-06-27/845923.shtml',
-      noiSyllabus: 'https://www.noi.cn/upload/resources/file/2023/03/15/1fa58eac9c412e01ce3c89c761058a43.pdf',
+      noiSyllabus: 'https://noi.ccf.org.cn/cbw/2025-04-18/841594.shtml',
       gespSyllabus: 'https://gesp.ccf.org.cn/101/1008/10012.html',
       luoguTraining: 'https://www.luogu.com.cn/training/list?type=official&page=1'
     }

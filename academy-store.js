@@ -47,7 +47,11 @@
       const completed = score >= 80 && !state.completedLessons.includes(lessonId)
         ? [...state.completedLessons, lessonId] : state.completedLessons;
       const wrong = new Set(state.wrongQuestionIds || []);
-      const lesson = (window.CSPJ_LESSONS || []).find(x => x.id === lessonId);
+      const lesson = [
+        ...(window.CSPJ_LESSONS || []),
+        ...((window.COURSE_CATALOG && window.COURSE_CATALOG.lessons) || []),
+        ...(window.FINAL_COURSE_LESSONS || [])
+      ].find(x => x.id === lessonId);
       (lesson ? lesson.quiz : []).forEach(q => wrong.delete(q.id));
       wrongIds.forEach(id => wrong.add(id));
       rememberActivity('quiz', `${lessonId} 小测 ${score} 分`);

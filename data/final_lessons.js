@@ -20,7 +20,7 @@
             title: '机器人走方格',
             statement: '机器人从 (0,0) 出发，读入一串只含 U、D、L、R 的命令，输出执行完后的坐标。',
             steps: ['用 x、y 记录当前位置。', '逐个读取字符，按方向修改一个坐标。', '所有命令处理完后输出 x 和 y。'],
-            code: `#include <iostream>\n#include <string>\n+using namespace std;\n+int main() {\n+    string s;\n+    cin >> s;\n+    int x = 0, y = 0; // 初始位置\n+    for (char c : s) {\n+        if (c == 'U') y++;\n+        else if (c == 'D') y--;\n+        else if (c == 'L') x--;\n+        else if (c == 'R') x++;\n+    }\n+    cout << x << ' ' << y << '\\n';\n+    return 0;\n+}`,
+            code: `#include <iostream>\n#include <string>\nusing namespace std;\nint main() {\n    string s;\n    cin >> s;\n    int x = 0, y = 0; // 初始位置\n    for (char c : s) {\n        if (c == 'U') y++;\n        else if (c == 'D') y--;\n        else if (c == 'L') x--;\n        else if (c == 'R') x++;\n    }\n    cout << x << ' ' << y << '\\n';\n    return 0;\n}`,
             walkthrough: ['输入 URRDD 时，前两个字符把位置变成 (1,1)。', '接着两个 R 把 x 加到 3，D 再把 y 减到 0。', '最终输出 3 0；每条命令只执行一次。']
           },
           ['把 U、D 对 y 的影响写反。', '循环从第二个字符开始，漏掉第一条命令。', '每轮重新把 x、y 设为 0。'],
@@ -38,7 +38,7 @@
             title: '寻找幸运密码',
             statement: '输出所有三位数：三个数位互不相同，并且三个数位之和等于给定的 s。',
             steps: ['枚举 100 到 999 的每个数。', '拆出百位、十位和个位。', '同时检查数位和与互不相同两个条件。'],
-            code: `#include <iostream>\n+using namespace std;\n+int main() {\n+    int s;\n+    cin >> s;\n+    for (int n = 100; n <= 999; n++) {\n+        int a = n / 100;\n+        int b = n / 10 % 10;\n+        int c = n % 10;\n+        bool different = a != b && a != c && b != c;\n+        if (a + b + c == s && different)\n+            cout << n << '\\n';\n+    }\n+    return 0;\n+}`,
+            code: `#include <iostream>\nusing namespace std;\nint main() {\n    int s;\n    cin >> s;\n    for (int n = 100; n <= 999; n++) {\n        int a = n / 100;\n        int b = n / 10 % 10;\n        int c = n % 10;\n        bool different = a != b && a != c && b != c;\n        if (a + b + c == s && different)\n            cout << n << '\\n';\n    }\n    return 0;\n}`,
             walkthrough: ['n=123 时，a=1、b=2、c=3。', '三个数位之和为 6，且两两不同，所以 s=6 时输出它。', 'n=114 虽然数位和也是 6，但有两个 1，要被筛掉。']
           },
           ['百位从 0 开始，枚举出了两位数。', '只检查 a!=b 和 b!=c，忘了 a!=c。', '拆十位时写成 n/10，得到的不是一位数字。'],
@@ -56,7 +56,7 @@
             title: '数字出现次数',
             statement: '给定 n 和数字 x，统计 1 到 n 的十进制写法中，x 一共出现多少次。',
             steps: ['枚举每个整数 i。', '复制 i 到 t，避免拆位破坏外层循环变量。', '反复检查 t 的个位，命中 x 就累加。'],
-            code: `#include <iostream>\n+using namespace std;\n+int main() {\n+    int n, x, answer = 0;\n+    cin >> n >> x;\n+    for (int i = 1; i <= n; i++) {\n+        int t = i; // 用副本拆位\n+        while (t > 0) {\n+            if (t % 10 == x) answer++;\n+            t /= 10;\n+        }\n+    }\n+    cout << answer << '\\n';\n+    return 0;\n+}`,
+            code: `#include <iostream>\nusing namespace std;\nint main() {\n    int n, x, answer = 0;\n    cin >> n >> x;\n    for (int i = 1; i <= n; i++) {\n        int t = i; // 用副本拆位\n        while (t > 0) {\n            if (t % 10 == x) answer++;\n            t /= 10;\n        }\n    }\n    cout << answer << '\\n';\n    return 0;\n}`,
             walkthrough: ['n=11、x=1 时，先检查 1，得到 1 次。', '检查 10 时个位是 0、十位是 1，再加 1。', '检查 11 时两个数位都是 1，再加 2，答案为 4。']
           },
           ['直接修改 i，导致外层循环乱掉。', 'while 条件写成 t>=0，t 变成 0 后死循环。', '看到 11 只加一次，没有逐位检查。'],
@@ -89,7 +89,7 @@
             title: '三科成绩排名',
             statement: '按总分降序、数学降序、学号升序排列学生，输出全部学号。',
             steps: ['读入每个学生三科成绩并算总分。', '把学号、数学和总分放进同一个结构体。', '写清三层比较规则后调用 sort。'],
-            code: `#include <algorithm>\n+#include <iostream>\n+#include <vector>\n+using namespace std;\n+struct Student { int id, math, total; };\n+bool before(const Student& a, const Student& b) {\n+    if (a.total != b.total) return a.total > b.total;\n+    if (a.math != b.math) return a.math > b.math;\n+    return a.id < b.id;\n+}\n+int main() {\n+    int n; cin >> n;\n+    vector<Student> a(n);\n+    for (int i = 0, x, y, z; i < n; i++) {\n+        cin >> x >> y >> z;\n+        a[i] = {i + 1, y, x + y + z};\n+    }\n+    sort(a.begin(), a.end(), before);\n+    for (auto s : a) cout << s.id << ' ';\n+    return 0;\n+}`,
+            code: `#include <algorithm>\n#include <iostream>\n#include <vector>\nusing namespace std;\nstruct Student { int id, math, total; };\nbool before(const Student& a, const Student& b) {\n    if (a.total != b.total) return a.total > b.total;\n    if (a.math != b.math) return a.math > b.math;\n    return a.id < b.id;\n}\nint main() {\n    int n; cin >> n;\n    vector<Student> a(n);\n    for (int i = 0, x, y, z; i < n; i++) {\n        cin >> x >> y >> z;\n        a[i] = {i + 1, y, x + y + z};\n    }\n    sort(a.begin(), a.end(), before);\n    for (auto s : a) cout << s.id << ' ';\n    return 0;\n}`,
             walkthrough: ['总分不同时，直接让总分高的人在前。', '总分相同才比较数学，避免后面的规则抢走前面的优先级。', '前两项仍相同，学号小的在前，顺序就唯一了。']
           },
           ['比较函数把降序和升序写反。', '总分相同后直接返回 false，漏掉后续条件。', '只排序总分，学号没有跟着学生移动。'],
@@ -107,7 +107,7 @@
             title: '最少小船数',
             statement: '每条船最多坐两人且总重量不超过 w，求把所有人运走至少需要几条船。',
             steps: ['把体重从小到大排序。', '最重的人一定要坐一条船，尝试带上最轻的人。', '能同船就两端一起收缩，否则只处理最重的人。'],
-            code: `#include <algorithm>\n+#include <iostream>\n+#include <vector>\n+using namespace std;\n+int main() {\n+    int w, n; cin >> w >> n;\n+    vector<int> a(n);\n+    for (int& x : a) cin >> x;\n+    sort(a.begin(), a.end());\n+    int left = 0, right = n - 1, boats = 0;\n+    while (left <= right) {\n+        if (left < right && a[left] + a[right] <= w)\n+            left++; // 最轻者与最重者同船\n+        right--;    // 最重者本轮一定上船\n+        boats++;\n+    }\n+    cout << boats << '\\n';\n+    return 0;\n+}`,
+            code: `#include <algorithm>\n#include <iostream>\n#include <vector>\nusing namespace std;\nint main() {\n    int w, n; cin >> w >> n;\n    vector<int> a(n);\n    for (int& x : a) cin >> x;\n    sort(a.begin(), a.end());\n    int left = 0, right = n - 1, boats = 0;\n    while (left <= right) {\n        if (left < right && a[left] + a[right] <= w)\n            left++; // 最轻者与最重者同船\n        right--;    // 最重者本轮一定上船\n        boats++;\n    }\n    cout << boats << '\\n';\n    return 0;\n}`,
             walkthrough: ['排序后先看最重的人，他不可能被留到别的选择里消失。', '若最轻的人都不能和他同船，其他人更不可能。', '若能同船，让最轻的人同行不会浪费更强的搭配机会。']
           },
           ['忘记先排序，左右两端没有轻重含义。', '只要两人就强行同船，没有检查重量和。', '只剩一人时还访问两个人的位置。'],
@@ -125,7 +125,7 @@
             title: '最多参加几场活动',
             statement: '给出 n 场活动的开始和结束时间，一个人不能同时参加两场，求最多参加几场。',
             steps: ['按结束时间从早到晚排序。', '记录上一场已选活动的结束时间。', '扫描活动，能接上就选择并更新结束时间。'],
-            code: `#include <algorithm>\n+#include <iostream>\n+#include <vector>\n+using namespace std;\n+struct Event { int start, finish; };\n+int main() {\n+    int n; cin >> n;\n+    vector<Event> a(n);\n+    for (auto& e : a) cin >> e.start >> e.finish;\n+    sort(a.begin(), a.end(), [](Event x, Event y) {\n+        return x.finish < y.finish;\n+    });\n+    int answer = 0, last = -1;\n+    for (auto e : a) {\n+        if (e.start >= last) {\n+            answer++;\n+            last = e.finish;\n+        }\n+    }\n+    cout << answer << '\\n';\n+    return 0;\n+}`,
+            code: `#include <algorithm>\n#include <iostream>\n#include <vector>\nusing namespace std;\nstruct Event { int start, finish; };\nint main() {\n    int n; cin >> n;\n    vector<Event> a(n);\n    for (auto& e : a) cin >> e.start >> e.finish;\n    sort(a.begin(), a.end(), [](Event x, Event y) {\n        return x.finish < y.finish;\n    });\n    int answer = 0, last = -1;\n    for (auto e : a) {\n        if (e.start >= last) {\n            answer++;\n            last = e.finish;\n        }\n    }\n    cout << answer << '\\n';\n    return 0;\n}`,
             walkthrough: ['先选结束最早的活动，它给后面留下最长的空闲部分。', '之后只关心当前活动能否接在 last 后面。', '选中后更新 last；没选中时 last 不变。']
           },
           ['按开始时间排序，看起来早却可能占很久。', '判断冲突时把 >= 写成 >，错过首尾相接。', '未选中的活动也更新了 last。'],
@@ -158,7 +158,7 @@
             title: '选 k 个数凑目标和',
             statement: '从 n 个整数中恰好选 k 个，统计有多少种选法的总和等于 target。',
             steps: ['递归参数记录当前位置、已选数量和当前总和。', '每个数都有“选”和“不选”两个分支。', '选够 k 个时检查总和并返回。'],
-            code: `#include <iostream>\n+using namespace std;\n+int n, k, target, a[25], answer;\n+void dfs(int pos, int chosen, int sum) {\n+    if (chosen == k) {\n+        if (sum == target) answer++;\n+        return;\n+    }\n+    if (pos == n || chosen + n - pos < k) return;\n+    dfs(pos + 1, chosen + 1, sum + a[pos]); // 选\n+    dfs(pos + 1, chosen, sum);              // 不选\n+}\n+int main() {\n+    cin >> n >> k >> target;\n+    for (int i = 0; i < n; i++) cin >> a[i];\n+    dfs(0, 0, 0);\n+    cout << answer << '\\n';\n+    return 0;\n+}`,
+            code: `#include <iostream>\nusing namespace std;\nint n, k, target, a[25], answer;\nvoid dfs(int pos, int chosen, int sum) {\n    if (chosen == k) {\n        if (sum == target) answer++;\n        return;\n    }\n    if (pos == n || chosen + n - pos < k) return;\n    dfs(pos + 1, chosen + 1, sum + a[pos]); // 选\n    dfs(pos + 1, chosen, sum);              // 不选\n}\nint main() {\n    cin >> n >> k >> target;\n    for (int i = 0; i < n; i++) cin >> a[i];\n    dfs(0, 0, 0);\n    cout << answer << '\\n';\n    return 0;\n}`,
             walkthrough: ['pos 指向现在要决定的数，两个递归分支覆盖选与不选。', 'chosen==k 时，这条选择已经完整，只检查一次。', '剩余数字不够凑满 k 个时提前返回，少走无用分支。']
           },
           ['只写“选”分支，漏掉大量方案。', '选够后没有 return，同一方案被继续扩展。', '把 pos 和 chosen 混在一起，无法判断还剩多少数。'],
@@ -176,7 +176,7 @@
             title: '迷宫最少步数',
             statement: 'n×m 地图中，0 能走、1 是墙，从左上角走到右下角，输出最少步数，走不到输出 -1。',
             steps: ['距离数组全部设为 -1，起点距离设为 0 后入队。', '每次取出队首，尝试上下左右四个相邻格。', '只把边界内、不是墙、没有访问过的格子入队。'],
-            code: `#include <iostream>\n+#include <queue>\n+using namespace std;\n+int g[105][105], d[105][105];\n+int main() {\n+    int n, m; cin >> n >> m;\n+    for (int i=0;i<n;i++) for(int j=0;j<m;j++) {\n+        cin >> g[i][j]; d[i][j] = -1;\n+    }\n+    queue<pair<int,int>> q; q.push({0,0}); d[0][0]=0;\n+    int dx[4]={1,-1,0,0}, dy[4]={0,0,1,-1};\n+    while (!q.empty()) {\n+        auto [x,y]=q.front(); q.pop();\n+        for(int k=0;k<4;k++){\n+            int nx=x+dx[k], ny=y+dy[k];\n+            if(nx<0||nx>=n||ny<0||ny>=m) continue;\n+            if(g[nx][ny]||d[nx][ny]!=-1) continue;\n+            d[nx][ny]=d[x][y]+1; q.push({nx,ny});\n+        }\n+    }\n+    cout << d[n-1][m-1] << '\\n';\n+}`,
+            code: `#include <iostream>\n#include <queue>\nusing namespace std;\nint g[105][105], d[105][105];\nint main() {\n    int n, m; cin >> n >> m;\n    for (int i=0;i<n;i++) for(int j=0;j<m;j++) {\n        cin >> g[i][j]; d[i][j] = -1;\n    }\n    queue<pair<int,int>> q; q.push({0,0}); d[0][0]=0;\n    int dx[4]={1,-1,0,0}, dy[4]={0,0,1,-1};\n    while (!q.empty()) {\n        auto [x,y]=q.front(); q.pop();\n        for(int k=0;k<4;k++){\n            int nx=x+dx[k], ny=y+dy[k];\n            if(nx<0||nx>=n||ny<0||ny>=m) continue;\n            if(g[nx][ny]||d[nx][ny]!=-1) continue;\n            d[nx][ny]=d[x][y]+1; q.push({nx,ny});\n        }\n    }\n    cout << d[n-1][m-1] << '\\n';\n}`,
             walkthrough: ['起点距离为 0，离起点一步的格子都会得到 1。', '队列保证距离 1 的格子全部处理完，才轮到距离 2。', '某格第一次写入距离后不再入队，所以不会绕圈。']
           },
           ['入队时不标记，导致同一格被重复加入。', '先访问数组下标，再检查是否越界。', '墙和未访问都用 0 表示，条件混乱。'],
@@ -194,7 +194,7 @@
             title: 'n 皇后方案数',
             statement: '在 n×n 棋盘每行放一个皇后，任意两个皇后不能同列或同对角线，求方案数。',
             steps: ['按行递归，每层只决定这一行放在哪一列。', '用列、主对角线、副对角线三个数组判断冲突。', '放置后标记，递归返回后取消标记。'],
-            code: `#include <iostream>\n+using namespace std;\n+int n, answer;\n+bool col[20], diag1[40], diag2[40];\n+void dfs(int row) {\n+    if (row == n) { answer++; return; }\n+    for (int c = 0; c < n; c++) {\n+        int d1 = row - c + n, d2 = row + c;\n+        if (col[c] || diag1[d1] || diag2[d2]) continue;\n+        col[c] = diag1[d1] = diag2[d2] = true;\n+        dfs(row + 1);\n+        col[c] = diag1[d1] = diag2[d2] = false; // 撤销\n+    }\n+}\n+int main() {\n+    cin >> n;\n+    dfs(0);\n+    cout << answer << '\\n';\n+}`,
+            code: `#include <iostream>\nusing namespace std;\nint n, answer;\nbool col[20], diag1[40], diag2[40];\nvoid dfs(int row) {\n    if (row == n) { answer++; return; }\n    for (int c = 0; c < n; c++) {\n        int d1 = row - c + n, d2 = row + c;\n        if (col[c] || diag1[d1] || diag2[d2]) continue;\n        col[c] = diag1[d1] = diag2[d2] = true;\n        dfs(row + 1);\n        col[c] = diag1[d1] = diag2[d2] = false; // 撤销\n    }\n}\nint main() {\n    cin >> n;\n    dfs(0);\n    cout << answer << '\\n';\n}`,
             walkthrough: ['每层固定一行，所以不用再检查同一行冲突。', 'row-c 可能是负数，加 n 后才能安全当数组下标。', '递归返回后清除三个标记，下一列才能从同一现场出发。']
           },
           ['忘记撤销标记，后面的方案全部被误判冲突。', 'row-c 直接作为数组下标，出现负数。', '到 row==n 时忘记 return，又继续访问不存在的行。'],
@@ -227,7 +227,7 @@
             title: '爬楼梯方案数',
             statement: '每次可以走 1 级或 2 级台阶，求走到第 n 级一共有多少种不同走法。',
             steps: ['定义 dp[i] 为到达第 i 级的方案数。', '最后一步只有走 1 级或 2 级两种来源。', '得到 dp[i]=dp[i-1]+dp[i-2]，从小到大计算。'],
-            code: `#include <iostream>\n+using namespace std;\n+int main() {\n+    int n; cin >> n;\n+    long long dp[55] = {};\n+    dp[0] = 1; // 什么也不走是一种起点方案\n+    if (n >= 1) dp[1] = 1;\n+    for (int i = 2; i <= n; i++)\n+        dp[i] = dp[i - 1] + dp[i - 2];\n+    cout << dp[n] << '\\n';\n+    return 0;\n+}`,
+            code: `#include <iostream>\nusing namespace std;\nint main() {\n    int n; cin >> n;\n    long long dp[55] = {};\n    dp[0] = 1; // 什么也不走是一种起点方案\n    if (n >= 1) dp[1] = 1;\n    for (int i = 2; i <= n; i++)\n        dp[i] = dp[i - 1] + dp[i - 2];\n    cout << dp[n] << '\\n';\n    return 0;\n}`,
             walkthrough: ['dp[0]=1 表示从起点出发的空方案，方便统一转移。', '到第 2 级可从第 1 级走一步，也可从第 0 级走两步。', '每个方案的最后一步只能属于一种来源，所以相加不会重复。']
           },
           ['只写转移式，忘记给 dp[0]、dp[1]。', '状态没说“恰好到达”，把经过和到达混为一谈。', '答案增长快仍使用 int，发生溢出。'],
@@ -245,7 +245,7 @@
             title: '采药',
             statement: '总时间为 T，有 n 株药，每株有采摘时间和价值，每株最多采一次，求最大总价值。',
             steps: ['dp[j] 记录时间上限 j 内的最大价值。', '枚举每株药，再让 j 从 T 倒着走到该药耗时。', '比较不采与采这一株两种结果，取较大值。'],
-            code: `#include <algorithm>\n+#include <iostream>\n+using namespace std;\n+int main() {\n+    int T, n; cin >> T >> n;\n+    int dp[1005] = {};\n+    for (int i = 0; i < n; i++) {\n+        int cost, value;\n+        cin >> cost >> value;\n+        for (int j = T; j >= cost; j--) {\n+            dp[j] = max(dp[j], dp[j - cost] + value);\n+        }\n+    }\n+    cout << dp[T] << '\\n';\n+    return 0;\n+}`,
+            code: `#include <algorithm>\n#include <iostream>\nusing namespace std;\nint main() {\n    int T, n; cin >> T >> n;\n    int dp[1005] = {};\n    for (int i = 0; i < n; i++) {\n        int cost, value;\n        cin >> cost >> value;\n        for (int j = T; j >= cost; j--) {\n            dp[j] = max(dp[j], dp[j - cost] + value);\n        }\n    }\n    cout << dp[T] << '\\n';\n    return 0;\n}`,
             walkthrough: ['dp[j] 原值代表不采当前药。', 'dp[j-cost]+value 代表给当前药腾出时间后再采它。', '倒序让 dp[j-cost] 仍是上一轮结果，不会在同一轮重复使用当前药。']
           },
           ['容量正序更新，把同一株药采了很多次。', 'j 从 0 开始，访问 j-cost 的负下标。', '把 cost 和 value 在转移式里写反。'],
@@ -263,7 +263,7 @@
             title: '网格收集金币',
             statement: '从左上角走到右下角，每次只能向右或向下，经过格子就得到其中金币，求最多金币。',
             steps: ['按从上到下、从左到右的顺序填表。', '当前格只比较上方和左方的最大值。', '取较大前驱并加上当前格金币。'],
-            code: `#include <algorithm>\n+#include <iostream>\n+using namespace std;\n+long long dp[505][505];\n+int main() {\n+    int n, m; cin >> n >> m;\n+    for (int i = 1; i <= n; i++) {\n+        for (int j = 1; j <= m; j++) {\n+            int coin; cin >> coin;\n+            dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]) + coin;\n+        }\n+    }\n+    cout << dp[n][m] << '\\n';\n+    return 0;\n+}`,
+            code: `#include <algorithm>\n#include <iostream>\nusing namespace std;\nlong long dp[505][505];\nint main() {\n    int n, m; cin >> n >> m;\n    for (int i = 1; i <= n; i++) {\n        for (int j = 1; j <= m; j++) {\n            int coin; cin >> coin;\n            dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]) + coin;\n        }\n    }\n    cout << dp[n][m] << '\\n';\n    return 0;\n}`,
             walkthrough: ['填 dp[i][j] 时，上方和左方已经算好。', '所有到当前格的合法路线，最后一步必定来自这两个方向之一。', '因此只需保留较大的前驱答案，不必保存整条路线。']
           },
           ['循环顺序乱写，使用了尚未计算的状态。', '误把右方或下方当成前驱。', '金币总和可能很大却使用 int。'],
@@ -296,7 +296,7 @@
             title: '统计句子成分',
             statement: '读入一整行，分别输出英文字母、数字和空格的数量，其他符号忽略。',
             steps: ['用 getline 读入完整句子。', '逐个检查字符所在的范围。', '三个计数器分别累加，最后一起输出。'],
-            code: `#include <iostream>\n+#include <string>\n+using namespace std;\n+int main() {\n+    string s;\n+    getline(cin, s);\n+    int letters = 0, digits = 0, spaces = 0;\n+    for (char c : s) {\n+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))\n+            letters++;\n+        else if (c >= '0' && c <= '9')\n+            digits++;\n+        else if (c == ' ')\n+            spaces++;\n+    }\n+    cout << letters << ' ' << digits << ' ' << spaces << '\\n';\n+    return 0;\n+}`,
+            code: `#include <iostream>\n#include <string>\nusing namespace std;\nint main() {\n    string s;\n    getline(cin, s);\n    int letters = 0, digits = 0, spaces = 0;\n    for (char c : s) {\n        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))\n            letters++;\n        else if (c >= '0' && c <= '9')\n            digits++;\n        else if (c == ' ')\n            spaces++;\n    }\n    cout << letters << ' ' << digits << ' ' << spaces << '\\n';\n    return 0;\n}`,
             walkthrough: ['输入 Hi 2026! 时，H、i 计入字母。', '2、0、2、6 计入数字，中间空格单独计数。', '感叹号不属于三类，所以跳过。']
           },
           ['用 cin>>s，空格后的内容没有读入。', '把字符 c 与整数 0、9 比较，而不是字符 0、9。', '三个 if 全部独立，分类条件重叠时重复计数。'],
@@ -314,7 +314,7 @@
             title: '统计完整单词',
             statement: '输入目标单词和一行英文文本，不分大小写统计完整单词出现次数，并输出第一次出现的字符下标。',
             steps: ['把目标和正文全部转成小写。', '在正文首尾各补一个空格，把单词边界统一。', '查找“空格+目标+空格”，每次命中后继续向后找。'],
-            code: `#include <cctype>\n+#include <iostream>\n+#include <string>\n+using namespace std;\n+int main() {\n+    string word, text;\n+    getline(cin, word); getline(cin, text);\n+    for (char& c : word) c = tolower((unsigned char)c);\n+    for (char& c : text) c = tolower((unsigned char)c);\n+    string hay = " " + text + " ";\n+    string needle = " " + word + " ";\n+    int count = 0, first = -1;\n+    size_t pos = hay.find(needle);\n+    while (pos != string::npos) {\n+        if (first == -1) first = (int)pos;\n+        count++;\n+        pos = hay.find(needle, pos + 1);\n+    }\n+    if (!count) cout << -1 << '\\n';\n+    else cout << count << ' ' << first << '\\n';\n+}`,
+            code: `#include <cctype>\n#include <iostream>\n#include <string>\nusing namespace std;\nint main() {\n    string word, text;\n    getline(cin, word); getline(cin, text);\n    for (char& c : word) c = tolower((unsigned char)c);\n    for (char& c : text) c = tolower((unsigned char)c);\n    string hay = " " + text + " ";\n    string needle = " " + word + " ";\n    int count = 0, first = -1;\n    size_t pos = hay.find(needle);\n    while (pos != string::npos) {\n        if (first == -1) first = (int)pos;\n        count++;\n        pos = hay.find(needle, pos + 1);\n    }\n    if (!count) cout << -1 << '\\n';\n    else cout << count << ' ' << first << '\\n';\n}`,
             walkthrough: ['补上的开头空格让正文第一个单词也有统一左边界。', 'pos 在补空格后的字符串中，恰好等于原文单词起点。', '从 pos+1 继续寻找，避免永远找到同一个位置。']
           },
           ['直接查子串，把单词内部也算作命中。', '只转换目标单词大小写，正文没有转换。', 'find 失败返回 string::npos，却拿它当普通下标。'],
@@ -332,7 +332,7 @@
             title: '游程压缩',
             statement: '把只含大小写字母的字符串压缩为“字符+连续次数”，例如 aaabbC 变成 a3b2C1。',
             steps: ['空串直接结束；否则用第一个字符开始第一段。', '后续字符相同就增加长度，不同就输出旧段并重置。', '循环结束后输出最后一段。'],
-            code: `#include <iostream>\n+#include <string>\n+using namespace std;\n+int main() {\n+    string s; cin >> s;\n+    if (s.empty()) return 0;\n+    char current = s[0];\n+    int length = 1;\n+    for (int i = 1; i < (int)s.size(); i++) {\n+        if (s[i] == current) length++;\n+        else {\n+            cout << current << length;\n+            current = s[i];\n+            length = 1;\n+        }\n+    }\n+    cout << current << length << '\\n'; // 最后一段\n+    return 0;\n+}`,
+            code: `#include <iostream>\n#include <string>\nusing namespace std;\nint main() {\n    string s; cin >> s;\n    if (s.empty()) return 0;\n    char current = s[0];\n    int length = 1;\n    for (int i = 1; i < (int)s.size(); i++) {\n        if (s[i] == current) length++;\n        else {\n            cout << current << length;\n            current = s[i];\n            length = 1;\n        }\n    }\n    cout << current << length << '\\n'; // 最后一段\n    return 0;\n}`,
             walkthrough: ['读到连续的 a 时，只增加 length。', '第一次读到 b 时，先输出 a 段，再把 current 改成 b。', '字符串结束后手动输出最后的 C1，否则它会丢失。']
           },
           ['循环仍从下标 0 开始，第一个字符被数了两次。', '字符变化时先覆盖 current，导致输出错字符。', '忘记循环后的最后一次结算。'],
@@ -365,7 +365,7 @@
             title: '括号匹配',
             statement: '给定只含 ()[]{} 的字符串，判断所有括号是否类型正确、顺序正确并且全部配对。',
             steps: ['遇到左括号就压入栈。', '遇到右括号先检查栈是否为空，再检查栈顶类型。', '匹配则弹出；扫描结束后栈也必须为空。'],
-            code: `#include <iostream>\n+#include <stack>\n+#include <string>\n+using namespace std;\n+bool match(char left, char right) {\n+    return (left=='('&&right==')') ||\n+           (left=='['&&right==']') ||\n+           (left=='{'&&right=='}');\n+}\n+int main() {\n+    string s; cin >> s;\n+    stack<char> st;\n+    for (char c : s) {\n+        if (c=='(' || c=='[' || c=='{') st.push(c);\n+        else {\n+            if (st.empty() || !match(st.top(), c)) {\n+                cout << "NO\\n"; return 0;\n+            }\n+            st.pop();\n+        }\n+    }\n+    cout << (st.empty() ? "YES\\n" : "NO\\n");\n+}`,
+            code: `#include <iostream>\n#include <stack>\n#include <string>\nusing namespace std;\nbool match(char left, char right) {\n    return (left=='('&&right==')') ||\n           (left=='['&&right==']') ||\n           (left=='{'&&right=='}');\n}\nint main() {\n    string s; cin >> s;\n    stack<char> st;\n    for (char c : s) {\n        if (c=='(' || c=='[' || c=='{') st.push(c);\n        else {\n            if (st.empty() || !match(st.top(), c)) {\n                cout << "NO\\n"; return 0;\n            }\n            st.pop();\n        }\n    }\n    cout << (st.empty() ? "YES\\n" : "NO\\n");\n}`,
             walkthrough: ['读到 ([ 时，栈顶是 [，它必须先与 ] 配对。', '右括号到来而栈为空，说明没有可配对的左括号。', '扫描完栈非空，说明还有左括号没有闭合。']
           },
           ['在检查 empty 之前就调用 top，程序可能崩溃。', '只判断左右数量相同，没有检查嵌套顺序。', '扫描结束直接输出 YES，忘记检查栈是否为空。'],
@@ -383,7 +383,7 @@
             title: '最近 60 秒事件数',
             statement: '事件时间按不下降顺序到来；每读入一个时间 t，输出区间 [t-59,t] 内的事件数量。',
             steps: ['当前事件时间入队。', '不断删除小于 t-59 的队首时间。', '队列当前长度就是最近 60 秒事件数。'],
-            code: `#include <iostream>\n+#include <queue>\n+using namespace std;\n+int main() {\n+    int n; cin >> n;\n+    queue<int> q;\n+    for (int i = 0; i < n; i++) {\n+        int t; cin >> t;\n+        q.push(t);\n+        while (!q.empty() && q.front() < t - 59)\n+            q.pop(); // 删除窗口左边的旧事件\n+        cout << q.size() << '\\n';\n+    }\n+    return 0;\n+}`,
+            code: `#include <iostream>\n#include <queue>\nusing namespace std;\nint main() {\n    int n; cin >> n;\n    queue<int> q;\n    for (int i = 0; i < n; i++) {\n        int t; cin >> t;\n        q.push(t);\n        while (!q.empty() && q.front() < t - 59)\n            q.pop(); // 删除窗口左边的旧事件\n        cout << q.size() << '\\n';\n    }\n    return 0;\n}`,
             walkthrough: ['时间按顺序到来，所以最旧时间一直在队首。', 't-59 仍在窗口内，只删除严格更小的时间。', '旧事件删除后，队列中恰好全是当前窗口事件。']
           },
           ['把 < 写成 <=，误删窗口左端点。', '只用 if 删除一个过期事件，队首后面可能还有旧事件。', '输入时间不是有序的却仍直接使用普通队列。'],
@@ -401,7 +401,7 @@
             title: '输出二叉树先序序列',
             statement: '节点编号为 1 到 n，输入每个节点的左右孩子编号，根为 1，输出先序遍历编号。',
             steps: ['用 leftChild、rightChild 数组保存两条孩子关系。', '递归函数收到 0 就返回。', '先输出自己，再递归左孩子和右孩子。'],
-            code: `#include <iostream>\n+using namespace std;\n+int leftChild[1005], rightChild[1005];\n+void preorder(int u) {\n+    if (u == 0) return;\n+    cout << u << ' ';       // 先访问根\n+    preorder(leftChild[u]); // 再访问左子树\n+    preorder(rightChild[u]);// 最后访问右子树\n+}\n+int main() {\n+    int n; cin >> n;\n+    for (int i = 1; i <= n; i++)\n+        cin >> leftChild[i] >> rightChild[i];\n+    preorder(1);\n+    return 0;\n+}`,
+            code: `#include <iostream>\nusing namespace std;\nint leftChild[1005], rightChild[1005];\nvoid preorder(int u) {\n    if (u == 0) return;\n    cout << u << ' ';       // 先访问根\n    preorder(leftChild[u]); // 再访问左子树\n    preorder(rightChild[u]);// 最后访问右子树\n}\nint main() {\n    int n; cin >> n;\n    for (int i = 1; i <= n; i++)\n        cin >> leftChild[i] >> rightChild[i];\n    preorder(1);\n    return 0;\n}`,
             walkthrough: ['preorder(1) 先输出根节点 1。', '进入左孩子后，会把整棵左子树处理完才返回。', '左子树完成后才进入右孩子，顺序正是根—左—右。']
           },
           ['没有把 0 当空节点，递归访问无效位置。', '输出语句放在两个递归之间，写成了中序遍历。', '默认根一定是 1，而题目若未保证就需要另外找根。'],

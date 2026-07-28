@@ -7,7 +7,8 @@
   "scripts": {
     "check": "node scripts/check.mjs",
     "test": "node --test",
-    "test:notes:e2e": "node e2e/notes-browser.mjs"
+    "test:notes:e2e": "node e2e/notes-browser.mjs",
+    "test:layout:e2e": "node e2e/layout-browser.mjs"
   },
   "license": "MIT"
 }

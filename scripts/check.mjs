@@ -14,6 +14,7 @@ try {
     'CSPJ_DATA.quizBank': D?.quizBank,
     'CSPJ_DATA.realExams': D?.realExams,
     'ACADEMY_DATA': w.ACADEMY_DATA,
+    'COURSE_CATALOG': w.COURSE_CATALOG,
     'CSPJ_LESSONS': w.CSPJ_LESSONS,
     'FINAL_LESSONS': w.FINAL_LESSONS,
     'REGULAR_L3_PROBLEMS': w.REGULAR_L3_PROBLEMS,
@@ -29,8 +30,10 @@ try {
   console.log(`  历年真题卷 realExams      ${D.realExams.length} 套`);
   console.log(`  复赛编程题 problems       ${D.problems.length} 题`);
   console.log(`  关卡 levels               ${D.levels.length} 关`);
+  console.log(`  常规课完整内容            ${w.COURSE_CATALOG.lessons.filter(x => x.track === 'regular').length} 节`);
+  console.log(`  GESP 完整内容             ${w.COURSE_CATALOG.lessons.filter(x => x.track === 'gesp').length} 节`);
   console.log(`  集训课 CSPJ_LESSONS       ${lessons.length} 节 / ${cards} 卡 / ${quizzes} 测`);
-  console.log(`  复赛专题 FINAL_LESSONS    ${Object.keys(w.FINAL_LESSONS).length} 个`);
+  console.log(`  复赛专题 FINAL_LESSONS    ${Object.keys(w.FINAL_LESSONS).length} 个 / ${Object.values(w.FINAL_LESSONS).reduce((n, topic) => n + topic.lessons.length, 0)} 节`);
   console.log(`  有道 L3 真题              ${w.REGULAR_L3_PROBLEMS.length} 题`);
   console.log(`  初赛年度入口 firstRound   ${w.ACADEMY_DATA.firstRound.length} 年`);
 } catch (err) {

@@ -17,6 +17,7 @@ const LOAD_ORDER = [
   'problems',
   'articles',
   'academy',
+  'course_catalog',
   'cspj_lessons',
   'final_lessons',
   'regular_l3',
