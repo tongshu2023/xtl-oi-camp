@@ -45,6 +45,17 @@ test('146 节课全部达到可交付内容合同', () => {
   }
 });
 
+test('易混课程命中自己的知识模型而不是泛化模板', () => {
+  const catalog = loadCatalog();
+  const byId = id => catalog.lessons.find(lesson => lesson.id === id);
+  assert.equal(byId('regular-l2-10').example.title, '打印乘法表');
+  assert.equal(byId('regular-l4-12').example.title, '最低布线成本');
+  assert.equal(byId('gesp-7-02').example.title, '网格最小路径和');
+  assert.equal(byId('gesp-8-06').example.title, '非负权单源最短路');
+  assert.match(byId('regular-l4-18').concepts[0][1], /阶段测评覆盖/);
+  assert.ok(!catalog.lessons.some(lesson => lesson.example.title === '最小建模练习'));
+});
+
 test('GESP 2026 修订边界已落实', () => {
   const catalog = loadCatalog();
   const grade1 = catalog.courses.find(x => x.id === 'gesp-1');
