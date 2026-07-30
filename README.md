@@ -1,5 +1,7 @@
 # 小图灵信奥学习站 · xtl-oi-camp
 
+[![data-check](https://github.com/tongshu2023/xtl-oi-camp/actions/workflows/data-check.yml/badge.svg)](https://github.com/tongshu2023/xtl-oi-camp/actions/workflows/data-check.yml)
+
 > CSP-J / GESP 信息学奥赛一站式静态学习站 —— 70 节常规课、76 节 GESP、26 节 CSP-J 内容课和 2 个真题 Boss，双击即用、零后端。
 >
 > A static, zero-backend learning site for China's CSP-J / GESP informatics-olympiad (competitive programming) prep.
