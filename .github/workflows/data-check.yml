@@ -1,7 +1,7 @@
 name: data-check
 
-# 数据完整性校验：任何改动数据/脚本/测试的提交都自动跑一遍，
-# 挡住答案越界、真题引用失效、交付清单对不上等隐蔽回归。零依赖，无需 npm install。
+# 数据 + 首页元信息完整性校验：任何改动数据/脚本/测试/首页的提交都自动跑一遍，
+# 挡住答案越界、真题引用失效、交付清单对不上、首页社交预览元信息被误删等隐蔽回归。零依赖，无需 npm install。
 on:
   push:
     paths:
@@ -9,6 +9,7 @@ on:
       - 'scripts/**'
       - 'test/**'
       - 'package.json'
+      - 'index.html'
       - '.github/workflows/data-check.yml'
   pull_request:
     paths:
@@ -16,6 +17,7 @@ on:
       - 'scripts/**'
       - 'test/**'
       - 'package.json'
+      - 'index.html'
   workflow_dispatch:
 
 jobs:
