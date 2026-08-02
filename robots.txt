@@ -1,0 +1,7 @@
+# 小图灵信奥学习站 · 爬虫抓取规则
+# 站点入口只有首页（学院）与 cspj-lab.html（CSP-J 训练台）两个；
+# content_staging/ 是真题 PDF 的整理暂存区，不是面向访客的页面，不参与收录。
+User-agent: *
+Disallow: /content_staging/
+
+Sitemap: https://tongshu2023.github.io/xtl-oi-camp/sitemap.xml
