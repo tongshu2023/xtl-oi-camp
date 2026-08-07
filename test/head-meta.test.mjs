@@ -84,3 +84,24 @@ test('theme-color 为合法十六进制色值', () => {
   assert.ok(filled(tc), 'theme-color 缺失或为空');
   assert.ok(/^#[0-9a-fA-F]{3,8}$/.test(tc), `theme-color 非法色值：${tc}`);
 });
+
+// JSON-LD 结构化数据契约：<head> 里应有一段合法 application/ld+json，
+// 声明本站为 schema.org 的 WebSite + Course，供搜索引擎生成教育类富结果。
+// 这段 JSON 手写易出语法错（多余逗号、引号未转义）而页面照常渲染、肉眼不报错，
+// 一旦 JSON.parse 失败搜索引擎会静默丢弃整段结构化数据；本测试把“能被解析且类型齐备”钉成回归护栏。
+test('结构化数据：head 内含合法 JSON-LD 且声明 WebSite + Course', () => {
+  const m = head.match(/<script\s+type=["']application\/ld\+json["']\s*>([\s\S]*?)<\/script>/i);
+  assert.ok(m, 'head 缺少 application/ld+json 结构化数据');
+  let data;
+  assert.doesNotThrow(() => {
+    data = JSON.parse(m[1]);
+  }, 'JSON-LD 必须是合法 JSON（检查多余逗号 / 引号）');
+  assert.equal(data['@context'], 'https://schema.org', 'JSON-LD @context 应为 https://schema.org');
+  const nodes = Array.isArray(data['@graph']) ? data['@graph'] : [data];
+  const types = nodes.map((n) => n && n['@type']);
+  assert.ok(types.includes('WebSite'), 'JSON-LD 应含 WebSite 节点');
+  assert.ok(types.includes('Course'), 'JSON-LD 应含 Course 节点');
+  const course = nodes.find((n) => n && n['@type'] === 'Course');
+  assert.ok(filled(course.name), 'Course.name 缺失或为空');
+  assert.ok(course.hasCourseInstance && course.hasCourseInstance.courseMode, 'Course 应含 hasCourseInstance.courseMode');
+});
