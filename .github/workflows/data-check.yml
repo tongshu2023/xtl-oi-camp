@@ -10,6 +10,7 @@ on:
       - 'test/**'
       - 'package.json'
       - 'index.html'
+      - 'cspj-lab.html'
       - 'sitemap.xml'
       - 'robots.txt'
       - '.github/workflows/data-check.yml'
@@ -20,6 +21,7 @@ on:
       - 'test/**'
       - 'package.json'
       - 'index.html'
+      - 'cspj-lab.html'
       - 'sitemap.xml'
       - 'robots.txt'
   workflow_dispatch:
