@@ -61,7 +61,7 @@
     return `<footer><div><strong>小图灵信奥学习站</strong><span>常规课 · GESP 1–8级 · CSP-J 第一轮/第二轮</span></div><div class="source-links"><a href="${A.sources.cspNotice}" target="_blank" rel="noreferrer">CCF 认证说明</a><a href="${A.sources.gespSyllabus}" target="_blank" rel="noreferrer">GESP 官方大纲</a><a href="${A.sources.noiSyllabus}" target="_blank" rel="noreferrer">NOI 官方大纲</a></div></footer>`;
   }
 
-  function shell(content, active) { return `${header(active)}<main>${content}</main>${footer()}`; }
+  function shell(content, active) { return `<a class="skip-link" href="#main-content">跳到主内容</a>${header(active)}<main id="main-content" tabindex="-1">${content}</main>${footer()}`; }
 
   function homePage() {
     const s = store.get(); const done = allLearningLessons.filter(x=>s.completedLessons.includes(x.id)).length; const due = store.dueCards(allCards()).length;
