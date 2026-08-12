@@ -82,7 +82,11 @@
   }
 
   function shell(content, active = '', options = {}) {
-    return `<div class="shell">${header(active)}${content}${options.noFooter ? '' : footer()}</div>`;
+    // 无障碍：每个视图都经 shell() 渲染同一条固定顶部导航（切页即重复出现）。给内容里第一个
+    // <main> 注入 id="main-content"/tabindex="-1"（只替首个，保证全页恰一个可聚焦主地标），并在
+    // 导航前置一个默认藏、聚焦才现身的 skip-link——键盘/读屏用户按一次 Tab 即可跳过重复导航。WCAG 2.4.1。
+    const body = content.replace('<main', '<main id="main-content" tabindex="-1"');
+    return `<div class="shell"><a class="skip-link" href="#main-content">跳到主内容</a>${header(active)}${body}${options.noFooter ? '' : footer()}</div>`;
   }
 
   function countdownDays() {
