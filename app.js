@@ -607,9 +607,18 @@
     const previous = document.getElementById('prev-slide');
     const next = document.getElementById('next-slide');
     const reveal = document.getElementById('reveal-answer');
-    if (previous) previous.onclick = () => { ui.projectorIndex = Math.max(0, ui.projectorIndex - 1); ui.projectorReveal = false; render(); };
-    if (next) next.onclick = () => { ui.projectorIndex = Math.min(slides.length - 1, ui.projectorIndex + 1); ui.projectorReveal = false; render(); };
-    if (reveal) reveal.onclick = () => { ui.projectorReveal = true; render(); };
+    // 投屏授课是幻灯片式操作：每次翻页都会 render() 重建整页 DOM，被点的按钮随之销毁，
+    // 焦点默认掉回 <body>——用键盘/翻页笔连续讲课的老师每翻一页都得重新 Tab 回按钮。
+    // 翻页后把焦点交还给正在驱动的控件；若它到头被禁用，则移交对侧按钮，保证键盘流不断。
+    const restoreFocus = (preferredId, fallbackId) => {
+      const preferred = document.getElementById(preferredId);
+      if (preferred && !preferred.disabled) { preferred.focus(); return; }
+      const fallback = document.getElementById(fallbackId);
+      if (fallback && !fallback.disabled) fallback.focus();
+    };
+    if (previous) previous.onclick = () => { ui.projectorIndex = Math.max(0, ui.projectorIndex - 1); ui.projectorReveal = false; render(); restoreFocus('prev-slide', 'next-slide'); };
+    if (next) next.onclick = () => { ui.projectorIndex = Math.min(slides.length - 1, ui.projectorIndex + 1); ui.projectorReveal = false; render(); restoreFocus('next-slide', 'prev-slide'); };
+    if (reveal) reveal.onclick = () => { ui.projectorReveal = true; render(); restoreFocus('next-slide', 'prev-slide'); };
   }
 
   function render() {
