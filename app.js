@@ -430,7 +430,7 @@
     if (slide.type === 'lesson') content = `<div class="projector-copy">${slide.body.map(text => `<p>${esc(text)}</p>`).join('')}</div>`;
     if (slide.type === 'question') content = `${slide.code ? codeBlock(slide.code) : ''}<div class="projector-options">${slide.options.map((option, optionIndex) => `<div><span>${String.fromCharCode(65 + optionIndex)}</span>${esc(option)}</div>`).join('')}</div>${ui.projectorReveal ? `<div class="projector-answer"><b>答案 ${String.fromCharCode(65 + slide.answer)}</b><p>${esc(slide.explanation)}</p></div>` : '<button class="reveal-btn" id="reveal-answer">点击揭晓答案</button>'}`;
     if (slide.type === 'problem') content = `<div class="projector-copy">${slide.body.map(text => `<p>${esc(text)}</p>`).join('')}</div>${ui.projectorReveal ? `<div class="projector-answer"><b>完整思路</b><p>${esc(slide.answerText)}</p>${codeBlock(slide.code, '参考代码')}</div>` : '<button class="reveal-btn" id="reveal-answer">点击揭晓思路</button>'}`;
-    return `<div class="projector"><header><div><span>${esc(level.id)}</span><b>${esc(level.title)}</b></div><div>${index + 1} / ${slides.length}</div><button data-route="level/${level.id}/lesson">退出投屏</button></header><main><span class="projector-kicker">${esc(slide.kicker)}</span><h1>${esc(slide.title)}</h1>${content}</main><footer><button id="prev-slide" ${index === 0 ? 'disabled' : ''}>← 上一页</button><div class="slide-dots">${slides.map((_, dotIndex) => `<i class="${dotIndex === index ? 'active' : ''}"></i>`).join('')}</div><button id="next-slide" ${index === slides.length - 1 ? 'disabled' : ''}>下一页 →</button></footer></div>`;
+    return `<div class="projector"><header><div><span>${esc(level.id)}</span><b>${esc(level.title)}</b></div><div>${index + 1} / ${slides.length}</div><button data-route="level/${level.id}/lesson">退出投屏</button></header><main><span class="projector-kicker">${esc(slide.kicker)}</span><h1>${esc(slide.title)}</h1>${content}</main><footer><button id="prev-slide" ${index === 0 ? 'disabled' : ''}>← 上一页</button><div class="slide-dots" aria-hidden="true">${slides.map((_, dotIndex) => `<i class="${dotIndex === index ? 'active' : ''}"></i>`).join('')}</div><button id="next-slide" ${index === slides.length - 1 ? 'disabled' : ''}>下一页 →</button></footer></div>`;
   }
 
   function emptyState(title, description) { return `<section class="empty-state"><span>◇</span><h2>${esc(title)}</h2><p>${esc(description)}</p></section>`; }
@@ -616,9 +616,29 @@
       const fallback = document.getElementById(fallbackId);
       if (fallback && !fallback.disabled) fallback.focus();
     };
-    if (previous) previous.onclick = () => { ui.projectorIndex = Math.max(0, ui.projectorIndex - 1); ui.projectorReveal = false; render(); restoreFocus('prev-slide', 'next-slide'); };
-    if (next) next.onclick = () => { ui.projectorIndex = Math.min(slides.length - 1, ui.projectorIndex + 1); ui.projectorReveal = false; render(); restoreFocus('next-slide', 'prev-slide'); };
-    if (reveal) reveal.onclick = () => { ui.projectorReveal = true; render(); restoreFocus('next-slide', 'prev-slide'); };
+    // render() 每次翻页都 app.innerHTML 整体重建投屏 DOM，放进 <main> 的 aria-live 区域是「刚插入的新
+    // 节点」，主流读屏器不会播报其初始内容——所以读屏用户只知道焦点回到了按钮，却不知道翻到了第几页、
+    // 讲到哪一张。修法：维护一个独立于 #app 容器、常驻 <body> 的 sr-announcer 活区（不随 render() 销毁），
+    // 翻页 / 揭晓后主动写入「第 X 页，共 Y 页：标题」，让读屏用户与看屏幕的老师同步得到页码与进度。
+    const announceSlide = () => {
+      const idx = Math.min(ui.projectorIndex, slides.length - 1);
+      const current = slides[idx];
+      if (!current) return;
+      const text = `第 ${idx + 1} 页，共 ${slides.length} 页：${current.title}${ui.projectorReveal ? '（已揭晓答案）' : ''}`;
+      let region = document.getElementById('sr-announcer');
+      if (!region) {
+        region = document.createElement('div');
+        region.id = 'sr-announcer';
+        region.className = 'sr-only';
+        region.setAttribute('aria-live', 'polite');
+        region.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(region);
+      }
+      region.textContent = text;
+    };
+    if (previous) previous.onclick = () => { ui.projectorIndex = Math.max(0, ui.projectorIndex - 1); ui.projectorReveal = false; render(); restoreFocus('prev-slide', 'next-slide'); announceSlide(); };
+    if (next) next.onclick = () => { ui.projectorIndex = Math.min(slides.length - 1, ui.projectorIndex + 1); ui.projectorReveal = false; render(); restoreFocus('next-slide', 'prev-slide'); announceSlide(); };
+    if (reveal) reveal.onclick = () => { ui.projectorReveal = true; render(); restoreFocus('next-slide', 'prev-slide'); announceSlide(); };
   }
 
   function render() {

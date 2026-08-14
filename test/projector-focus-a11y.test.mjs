@@ -54,19 +54,19 @@ test('三个翻页 handler 都在 render() 之后恢复焦点（方向/回落对
   // prev：优先回到自己，翻到首页被禁用则移交 next
   assert.match(
     body,
-    /previous\.onclick\s*=\s*\(\)\s*=>\s*\{[^}]*render\(\)\s*;\s*restoreFocus\(\s*'prev-slide'\s*,\s*'next-slide'\s*\)\s*;\s*\}/,
+    /previous\.onclick\s*=\s*\(\)\s*=>\s*\{[^}]*render\(\)\s*;\s*restoreFocus\(\s*'prev-slide'\s*,\s*'next-slide'\s*\)\s*;/,
     "prev handler 应为 render() 后 restoreFocus('prev-slide','next-slide')",
   );
   // next：优先回到自己，翻到末页被禁用则移交 prev
   assert.match(
     body,
-    /next\.onclick\s*=\s*\(\)\s*=>\s*\{[^}]*render\(\)\s*;\s*restoreFocus\(\s*'next-slide'\s*,\s*'prev-slide'\s*\)\s*;\s*\}/,
+    /next\.onclick\s*=\s*\(\)\s*=>\s*\{[^}]*render\(\)\s*;\s*restoreFocus\(\s*'next-slide'\s*,\s*'prev-slide'\s*\)\s*;/,
     "next handler 应为 render() 后 restoreFocus('next-slide','prev-slide')",
   );
   // reveal：揭晓答案后 reveal 按钮消失，焦点交给 next（末页则 prev），让老师可继续
   assert.match(
     body,
-    /reveal\.onclick\s*=\s*\(\)\s*=>\s*\{[^}]*render\(\)\s*;\s*restoreFocus\(\s*'next-slide'\s*,\s*'prev-slide'\s*\)\s*;\s*\}/,
+    /reveal\.onclick\s*=\s*\(\)\s*=>\s*\{[^}]*render\(\)\s*;\s*restoreFocus\(\s*'next-slide'\s*,\s*'prev-slide'\s*\)\s*;/,
     "reveal handler 应为 render() 后 restoreFocus('next-slide','prev-slide')",
   );
 });
