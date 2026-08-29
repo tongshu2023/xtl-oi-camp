@@ -45,6 +45,8 @@ function sliceFunctionBody(source, signature) {
 
 const classroomBody = sliceFunctionBody(appJs, 'function classroomPage(');
 const bindBody = sliceFunctionBody(appJs, 'function bindClassroom(');
+// 08-30：区域创建/写入语义收敛进模块级 srAnnounce()，投屏与学生自测共用；活区契约在此断言。
+const srAnnounceBody = sliceFunctionBody(appJs, 'function srAnnounce(');
 
 test('投屏 footer 的装饰性 .slide-dots 对读屏隐藏（aria-hidden）', () => {
   // 装饰圆点无信息量，读屏应跳过，改由 sr-announcer 播报真实页码。
@@ -55,11 +57,13 @@ test('投屏 footer 的装饰性 .slide-dots 对读屏隐藏（aria-hidden）', 
   );
 });
 
-test('bindClassroom 定义了带 aria-live / aria-atomic 语义的 sr-announcer 活区', () => {
+test('srAnnounce 活区带 aria-live / aria-atomic 语义，announceSlide 复用它播报页码', () => {
+  // 活区创建与语义已收敛进模块级 srAnnounce()；announceSlide 只负责拼页码文本并委托播报。
+  assert.match(srAnnounceBody, /getElementById\(\s*'sr-announcer'\s*\)/, 'srAnnounce 应复用同一个 sr-announcer 节点');
+  assert.match(srAnnounceBody, /setAttribute\(\s*'aria-live'\s*,\s*'polite'\s*\)/, 'sr-announcer 应为 aria-live="polite"');
+  assert.match(srAnnounceBody, /setAttribute\(\s*'aria-atomic'\s*,\s*'true'\s*\)/, 'sr-announcer 应为 aria-atomic="true"，整段重读');
   assert.match(bindBody, /const\s+announceSlide\s*=\s*\(\)\s*=>/, 'bindClassroom 应定义 announceSlide 辅助');
-  assert.match(bindBody, /getElementById\(\s*'sr-announcer'\s*\)/, 'announceSlide 应复用同一个 sr-announcer 节点');
-  assert.match(bindBody, /setAttribute\(\s*'aria-live'\s*,\s*'polite'\s*\)/, 'sr-announcer 应为 aria-live="polite"');
-  assert.match(bindBody, /setAttribute\(\s*'aria-atomic'\s*,\s*'true'\s*\)/, 'sr-announcer 应为 aria-atomic="true"，整段重读页码与标题');
+  assert.match(bindBody, /srAnnounce\(\s*text\s*\)/, 'announceSlide 应委托 srAnnounce(text) 播报');
   // 播报文本需带页码「第 X 页，共 Y 页」，让读屏用户与看屏幕的老师同步进度
   assert.match(bindBody, /第\s*\$\{[^}]*\}\s*页，共\s*\$\{[^}]*\}\s*页/, 'announceSlide 应播报「第 X 页，共 Y 页」页码进度');
 });
@@ -68,12 +72,12 @@ test('回归护栏：sr-announcer 必须挂在 <body> 上，不能放进会被 r
   // 关键：announcer 若挂进 #app，render() 的 app.innerHTML 会把它连同初始文本一起销毁重建，
   // 读屏器不播报「刚插入节点」的内容——修复即失效。故必须常驻 body。
   assert.match(
-    bindBody,
+    srAnnounceBody,
     /document\.body\.appendChild\(\s*region\s*\)/,
     'sr-announcer 应 document.body.appendChild，常驻 body 不随 render() 销毁',
   );
   assert.doesNotMatch(
-    bindBody,
+    srAnnounceBody,
     /app\.appendChild\(\s*region\s*\)|app\.innerHTML[^\n]*sr-announcer/,
     'sr-announcer 不得挂进 #app 容器（会被 render() 重建而失效）',
   );
