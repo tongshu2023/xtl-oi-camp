@@ -8,7 +8,8 @@
     "check": "node scripts/check.mjs",
     "test": "node --test",
     "test:notes:e2e": "node e2e/notes-browser.mjs",
-    "test:layout:e2e": "node e2e/layout-browser.mjs"
+    "test:layout:e2e": "node e2e/layout-browser.mjs",
+    "test:score:e2e": "node e2e/score-announce-browser.mjs"
   },
   "license": "MIT"
 }
