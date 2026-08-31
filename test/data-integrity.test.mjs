@@ -6,6 +6,9 @@
 //   3) 引用完整性：真题卷引用的题 ID 必须真实存在于题库
 //   4) 主键唯一：题库 / 编程题 / L3 题的 id 不重复
 //   5) 交付清单一致：DELIVERY.md 写下的 8 节课 / 48 卡 / 40 测 / 31 道 L3 题必须与仓库实际吻合
+//   6) 选项可作答：任何小题的选项都不得为空串、也不得彼此重复（否则学生会看到重复/空白选项）
+//   7) 题干完整：阅读程序 / 完善程序题必须带非空 code，否则题面残缺无法作答
+//   8) 引用不重复：同一套真题卷不得把同一道题引用两次
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadData } from '../scripts/load-data.mjs';
@@ -54,6 +57,24 @@ test('quizBank：每个小题的 answer 下标都不越界', () => {
   }
 });
 
+test('quizBank：每个小题的选项都非空且互不重复', () => {
+  for (const q of D.quizBank) {
+    q.subs.forEach((s, i) => {
+      const opts = s.options.map((o) => String(o).trim());
+      assert.ok(opts.every((o) => o.length > 0), `${q.id} 第 ${i + 1} 小题存在空白选项`);
+      assert.equal(new Set(opts).size, opts.length, `${q.id} 第 ${i + 1} 小题选项重复：${JSON.stringify(s.options)}`);
+    });
+  }
+});
+
+test('quizBank：阅读程序 / 完善程序题必须带非空 code', () => {
+  for (const q of D.quizBank) {
+    if (q.section === 'reading' || q.section === 'completion') {
+      assert.ok(typeof q.code === 'string' && q.code.trim().length > 0, `${q.id} section=${q.section} 缺少 code（题面残缺）`);
+    }
+  }
+});
+
 test('realExams：只引用题库中真实存在的题（引用完整性）', () => {
   const bank = new Set(D.quizBank.map((q) => q.id));
   for (const ex of D.realExams) {
@@ -61,6 +82,16 @@ test('realExams：只引用题库中真实存在的题（引用完整性）', ()
     for (const qid of ex.questionIds) {
       assert.ok(bank.has(qid), `真题卷 ${ex.id} 引用了不存在的题 ${qid}`);
     }
+  }
+});
+
+test('realExams：同一套卷不重复引用同一道题', () => {
+  for (const ex of D.realExams) {
+    assert.equal(
+      new Set(ex.questionIds).size,
+      ex.questionIds.length,
+      `真题卷 ${ex.id} 重复引用了同一道题：${JSON.stringify(ex.questionIds)}`,
+    );
   }
 });
 
@@ -129,6 +160,17 @@ test('CSPJ_LESSONS：清单与 DELIVERY 一致（8 节课/48 卡/40 测）且 qu
   }
   assert.equal(cards, 48, 'DELIVERY.md 声明有 48 张主动回忆卡');
   assert.equal(quizzes, 40, 'DELIVERY.md 声明有 40 道出口小测');
+});
+
+test('CSPJ_LESSONS：每道出口小测的选项都非空且互不重复', () => {
+  const lessons = w.CSPJ_LESSONS.lessons ?? w.CSPJ_LESSONS;
+  for (const l of lessons) {
+    for (const q of l.quiz) {
+      const opts = q.options.map((o) => String(o).trim());
+      assert.ok(opts.every((o) => o.length > 0), `课程 ${l.id} 的小测存在空白选项`);
+      assert.equal(new Set(opts).size, opts.length, `课程 ${l.id} 的小测选项重复：${JSON.stringify(q.options)}`);
+    }
+  }
 });
 
 test('FINAL_LESSONS：S1..S6 六个专题都在且各有课程', () => {
