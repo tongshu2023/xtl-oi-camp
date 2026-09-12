@@ -75,6 +75,17 @@ test('quizBank：阅读程序 / 完善程序题必须带非空 code', () => {
   }
 });
 
+test('quizBank：每题的 levelId 都指向真实存在的关卡（引用完整性）', () => {
+  const levelIds = new Set(D.levels.map((l) => l.id));
+  for (const q of D.quizBank) {
+    assert.ok(q.levelId, `题 ${q.id} 缺少 levelId`);
+    assert.ok(
+      levelIds.has(q.levelId),
+      `题 ${q.id} 的 levelId ${q.levelId} 不在 levels 中（孤儿题，学生在关卡里练不到它）`,
+    );
+  }
+});
+
 test('realExams：只引用题库中真实存在的题（引用完整性）', () => {
   const bank = new Set(D.quizBank.map((q) => q.id));
   for (const ex of D.realExams) {
@@ -112,6 +123,14 @@ test('problems：id 唯一、levelId 有效、luoguId 格式正确', () => {
       assert.match(p.luoguId, /^[A-Z]+\d+$/, `编程题 ${p.id} 的 luoguId ${p.luoguId} 格式不对`);
     }
     assert.ok(Array.isArray(p.samples), `${p.id} samples 不是数组`);
+  }
+});
+
+test('levels：id 全局唯一（各处按 id 引用关卡，重复会导致查找静默错乱）', () => {
+  const ids = D.levels.map((l) => l.id);
+  assert.equal(new Set(ids).size, ids.length, `levels 存在重复 id：${JSON.stringify(ids)}`);
+  for (const l of D.levels) {
+    assert.ok(['preliminary', 'final'].includes(l.track), `关卡 ${l.id} 的 track 非法：${l.track}`);
   }
 });
 
