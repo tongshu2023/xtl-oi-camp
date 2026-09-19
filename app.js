@@ -24,6 +24,23 @@
     setTimeout(() => { toastRoot.innerHTML = ''; }, 2400);
   }
 
+  // 常驻 <body> 的读屏播报活区：投屏翻页（announceSlide）与学生自测出分（submitQuiz / submitExam）
+  // 共用同一个 #sr-announcer。它独立于会被 render() 的 app.innerHTML 整体重建的 #app 容器，故翻页 /
+  // 出分后写入的文本是「已存在节点的更新」，主流读屏器才会朗读——若挂进 #app 会被重建成「刚插入节点」
+  // 而失效。aria-live=polite 不打断当前朗读，aria-atomic=true 整段重读，.sr-only 视觉隐藏但读屏可读。
+  function srAnnounce(message) {
+    let region = document.getElementById('sr-announcer');
+    if (!region) {
+      region = document.createElement('div');
+      region.id = 'sr-announcer';
+      region.className = 'sr-only';
+      region.setAttribute('aria-live', 'polite');
+      region.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(region);
+    }
+    region.textContent = message;
+  }
+
   function showModal({ title, content, confirmText = '确认', cancelText = '取消', onConfirm }) {
     modalRoot.innerHTML = `<div class="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-label="${esc(title)}">
       <h2>${esc(title)}</h2><div class="modal-content">${content}</div>
@@ -469,6 +486,9 @@
     store.recordQuiz(levelId, { score, questionIds: entries.map(entry => entry.id), wrongIds, createdAt: nowText() });
     Object.keys(ui.quizAnswers).filter(key => key.startsWith(`quiz:`)).forEach(key => delete ui.quizAnswers[key]);
     const passed = score >= config.passScore;
+    // 出分弹窗（role=dialog）不移动焦点、分数只在 <b> 里视觉呈现，读屏用户提交后听不到成绩；
+    // 主动把「得分 / 及格线 / 是否过关」写进常驻活区，与看屏幕的同学同步得到结果。
+    srAnnounce(`过关小测出分：${score} 分，及格线 ${config.passScore} 分，${passed ? '已过关，下一关已解锁' : '还差一点，先去错题本复盘'}`);
     showModal({ title: passed ? '过关成功' : '还差一点', confirmText: passed ? '返回地图' : '重新挑战', cancelText: passed ? '留在本关' : '去错题本', content: `<div class="result-score ${passed ? 'passed' : ''}"><b>${score}</b><span>分</span></div><p>${passed ? '下一关已经解锁，地图节点已点亮。' : `正确率需达到 ${config.passScore}%，先复盘错题再试一次。`}</p>`, onConfirm() { if (passed) route('home'); else render(); return true; } });
     const cancel = document.getElementById('modal-cancel');
     if (cancel && !passed) cancel.onclick = () => { modalRoot.innerHTML = ''; route('wrongbook'); };
@@ -501,6 +521,9 @@
         store.finishExam(record);
         ui.examAnswers = {};
         route(`report/${record.id}`);
+        // 交卷后 SPA 直接切到成绩报告页（route 触发 render 重建 #app），读屏对 hash 路由变化几乎不播报；
+        // 主动播报出分，让读屏用户交卷即刻知道分数与答对数，而非要自己去翻新页面找。
+        srAnnounce(`模考交卷出分：${record.score} 分，答对 ${record.correct}/${record.total} 小题`);
         return true;
       }
     });
@@ -625,16 +648,7 @@
       const current = slides[idx];
       if (!current) return;
       const text = `第 ${idx + 1} 页，共 ${slides.length} 页：${current.title}${ui.projectorReveal ? '（已揭晓答案）' : ''}`;
-      let region = document.getElementById('sr-announcer');
-      if (!region) {
-        region = document.createElement('div');
-        region.id = 'sr-announcer';
-        region.className = 'sr-only';
-        region.setAttribute('aria-live', 'polite');
-        region.setAttribute('aria-atomic', 'true');
-        document.body.appendChild(region);
-      }
-      region.textContent = text;
+      srAnnounce(text);
     };
     if (previous) previous.onclick = () => { ui.projectorIndex = Math.max(0, ui.projectorIndex - 1); ui.projectorReveal = false; render(); restoreFocus('prev-slide', 'next-slide'); announceSlide(); };
     if (next) next.onclick = () => { ui.projectorIndex = Math.min(slides.length - 1, ui.projectorIndex + 1); ui.projectorReveal = false; render(); restoreFocus('next-slide', 'prev-slide'); announceSlide(); };
